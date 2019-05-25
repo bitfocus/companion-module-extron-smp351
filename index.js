@@ -125,7 +125,7 @@ instance.prototype.CHOICES_CHANNEL = [
 ],
 
 instance.prototype.CHOICES_PRESET = [
-	{ label: 'channel preset', id: '1' },
+	{ label: 'user preset', id: '1' },
 	{ label: 'input preset', id: '2' },
 	{ label: 'layout preset', id: '7' }
 ]
@@ -182,20 +182,21 @@ instance.prototype.actions = function(system) {
 			}]
 		},
 		'recall_ps_channel': {
-			label: 'Recall a saved channel preset',
+			label: 'Recall a saved user preset',
 			options: [{
 					type: 'dropdown',
 					label: 'preset type',
 					id: 'ps_type',
-					choices: self.CHOICES_PRESET
+					choices: self.CHOICES_PRESET,
+					default: '1',
 			}, {
-				type: 'textinput',
-				label: 'channel',
+				type: 'dropdown',
+				label: 'output channel',
 				id: 'channel',
 				choices: self.CHOICES_CHANNEL,
 			}, {
 				type: 'textinput',
-				label: 'preset',
+				label: 'user preset',
 				id: 'preset',
 				regex: self.REGEX_NUMBER
 			}]
@@ -206,29 +207,31 @@ instance.prototype.actions = function(system) {
 					type: 'dropdown',
 					label: 'preset type',
 					id: 'ps_type',
-					choices: self.CHOICES_PRESET
+					choices: self.CHOICES_PRESET,
+					default: '2',
 			}, {
 				type: 'textinput',
-				label: 'preset',
+				label: 'input preset',
 				id: 'preset',
 				regex: self.REGEX_NUMBER
 			}, {
-				type: 'textinput',
+				type: 'dropdown',
 				label: 'output channel',
 				id: 'channel',
 				choices: self.CHOICES_CHANNEL,
 			}]
 		},
 		'recall_ps_layout': {
-			label: 'Recall a saved input preset',
+			label: 'Recall a saved layout preset',
 			options: [{
 					type: 'dropdown',
 					label: 'preset type',
 					id: 'ps_type',
-					choices: self.CHOICES_PRESET
+					choices: self.CHOICES_PRESET,
+					default: '7',
 			}, {
 				type: 'textinput',
-				label: 'preset',
+				label: 'layout preset',
 				id: 'preset',
 				regex: self.REGEX_NUMBER
 			}]
@@ -236,17 +239,15 @@ instance.prototype.actions = function(system) {
 		'start_rec': {
 			label: 'Start recording',
 			options: [{
-					type: 'textinput',
 					label: 'start record',
-					id: 'start',
+					id: 'start_rec',
 			}]
 		},
 		'stop_rec': {
 			label: 'Stop recording',
 			options: [{
-					type: 'textinput',
 					label: 'stop record',
-					id: 'stop',
+					id: 'stop_rec',
 			}]
 		}
 	};
