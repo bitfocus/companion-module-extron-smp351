@@ -40,7 +40,7 @@ instance.prototype.incomingData = function(data) {
 		self.socket.write(""+ "\n");
 	}
 
-	// Match first letter of expected response from unit.
+	// Match expected response from unit.
 	else if (self.login === false && data.match("SMP 351")) {
 		self.login = true;
 		self.status(self.STATUS_OK);
@@ -184,8 +184,7 @@ instance.prototype.actions = function(system) {
 		'recall_ps_channel': {
 			label: 'Recall a saved user preset',
 			options: [{
-					type: 'dropdown',
-					label: 'preset type',
+					label: 'user preset id',
 					id: 'ps_type',
 					choices: self.CHOICES_PRESET,
 					default: '1',
@@ -204,8 +203,7 @@ instance.prototype.actions = function(system) {
 		'recall_ps_input': {
 			label: 'Recall a saved input preset',
 			options: [{
-					type: 'dropdown',
-					label: 'preset type',
+					label: 'input preset id',
 					id: 'ps_type',
 					choices: self.CHOICES_PRESET,
 					default: '2',
@@ -224,8 +222,7 @@ instance.prototype.actions = function(system) {
 		'recall_ps_layout': {
 			label: 'Recall a saved layout preset',
 			options: [{
-					type: 'dropdown',
-					label: 'preset type',
+					label: 'layout preset id',
 					id: 'ps_type',
 					choices: self.CHOICES_PRESET,
 					default: '7',
