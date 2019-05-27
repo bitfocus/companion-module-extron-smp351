@@ -1,1 +1,1 @@
-# companion-module-extron-smp-351
+# companion-module-extron-smp351
