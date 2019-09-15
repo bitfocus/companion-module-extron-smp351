@@ -32,23 +32,31 @@ instance.prototype.incomingData = function(data) {
 	// Match part of the copyright response from unit when a connection is made.
 	if (self.login === false && data.match("Extron Electronics")) {
 		self.status(self.STATUS_WARNING,'Logging in');
-		self.socket.write("1I"+ "\n"); // Send Info Request
+		self.socket.write("2I"+ "\n"); // Query model description
 	}
 
 	if (self.login === false && data.match("Password:")) {
-		self.status(self.STATUS_WARNING,'Logging in');
-		self.socket.write(""+ "\n");
+		self.log('error', "expected no password");
+		self.status(self.STATUS_ERROR, 'expected no password');
 	}
 
 	// Match expected response from unit.
-	else if (self.login === false && data.match("SMP 351")) {
+	else if (self.login === false && data.match("Streaming")) {
 		self.login = true;
 		self.status(self.STATUS_OK);
 		debug("logged in");
 	}
-	else if (self.login === false && data.match('login incorrect')) {
-		self.log('error', "incorrect username/password (expected no password)");
-		self.status(self.STATUS_ERROR, 'Incorrect user/pass');
+	// Heatbeat to keep connection alive
+	function heartbeat() {
+		self.login = false;
+		self.status(self.STATUS_WARNING,'Checking Connection');
+		self.socket.write("2I"+ "\n"); // should respond with model description eg: "Streaming Media Processor"
+		debug("Checking Connection");
+		}
+	if (self.login === true) {
+		clearInterval(self.heartbeat_interval);
+		var beat_period = 180; // Seconds
+		self.heartbeat_interval = setInterval(heartbeat, beat_period * 1000);
 	}
 	else {
 		debug("data nologin", data);
@@ -156,6 +164,7 @@ instance.prototype.config_fields = function () {
 // When module gets deleted
 instance.prototype.destroy = function() {
 	var self = this;
+	clearInterval (self.heartbeat_interval); //Stop Heartbeat
 
 	if (self.socket !== undefined) {
 		self.socket.destroy();
