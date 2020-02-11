@@ -256,6 +256,20 @@ instance.prototype.actions = function(system) {
 					id: 'stop_rec',
 			}]
 		}
+		'pause_rec': {
+			label: 'Pause recording',
+			options: [{
+					label: 'Pause recording',
+					id: 'pause_rec',
+			}]
+		}
+		'extend_rec': {
+			label: 'Extend recording 5min',
+			options: [{
+					label: 'Extend recording 5min',
+					id: 'extend_rec',
+			}]
+		}
 	};
 
 	self.setActions(actions);
@@ -291,6 +305,14 @@ instance.prototype.action = function(action) {
 
 		case 'stop_rec':
 			cmd = "\x1BY0RCDR";
+			break;
+		
+		case 'pause_rec':
+			cmd = "\x1BY2RCDR";
+			break;
+		
+		case 'extend_rec':
+			cmd = "\x1BE35RCDR";
 			break;
 
 	}
