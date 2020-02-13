@@ -312,7 +312,7 @@ instance.prototype.action = function(action) {
 			break;
 		
 		case 'extend_rec':
-			cmd = "\x1BE35RCDR";
+			cmd = "\x1BE5RCDR";
 			break;
 
 	}
