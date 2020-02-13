@@ -255,14 +255,14 @@ instance.prototype.actions = function(system) {
 					label: 'stop record',
 					id: 'stop_rec',
 			}]
-		}
+		},
 		'pause_rec': {
 			label: 'Pause recording',
 			options: [{
 					label: 'Pause recording',
 					id: 'pause_rec',
 			}]
-		}
+		},
 		'extend_rec': {
 			label: 'Extend recording 5min',
 			options: [{
