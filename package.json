@@ -1,6 +1,6 @@
 {
 	"name": "extron-smp351",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"api_version": "1.0.0",
 	"keywords": [
 		"Stream",
@@ -8,7 +8,7 @@
 	],
 	"manufacturer": "Extron",
 	"product": "SMP 351",
-	"shortname": "SMP 351",
+	"shortname": "SMP351",
 	"description": "SMP 351 plugin for Companion",
 	"main": "index.js",
 	"scripts": {
