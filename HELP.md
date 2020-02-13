@@ -14,6 +14,6 @@
 * **Start Recording** Start a recording
 * **Stop Recording** Stop a recording
 * **Pause Recording** Pause a recording
-* **Extend Recording** Extend a recording
+* **Extend Scheduled Recording by 5min** Extend a recording
 
 > .
