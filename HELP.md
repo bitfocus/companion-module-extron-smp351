@@ -14,6 +14,10 @@
 * **Start Recording** Start a recording
 * **Stop Recording** Stop a recording
 * **Pause Recording** Pause a recording
-* **Extend Recording** Extend a scheduled recording by 5min
+* **Extend Recording** Extend a scheduled recording by X mins
+
+## Supported feebback
+
+* **Record state** start/stop/pause
 
 > .
