@@ -25,6 +25,18 @@ instance.prototype.updateConfig = function(config) {
 	self.init_tcp();
 };
 
+instance.prototype.init = function() {
+	var self = this;
+
+	debug = self.debug;
+	log = self.log;
+
+	self.states = {}
+	self.init_feedbacks()
+
+	self.init_tcp();
+};
+
 instance.prototype.incomingData = function(data) {
 	var self = this;
 	debug(data);
@@ -32,6 +44,7 @@ instance.prototype.incomingData = function(data) {
 	// Match part of the copyright response from unit when a connection is made.
 	if (self.login === false && data.match("Extron Electronics")) {
 		self.status(self.STATUS_WARNING,'Logging in');
+		self.socket.write("\x1B3CV"+ "\r"); // Set Verbose mode to 3
 		self.socket.write("2I"+ "\n"); // Query model description
 	}
 
@@ -58,19 +71,17 @@ instance.prototype.incomingData = function(data) {
 		var beat_period = 180; // Seconds
 		self.heartbeat_interval = setInterval(heartbeat, beat_period * 1000);
 	}
+	// Match recording state change expected response from unit.
+	if (self.login === true && data.match(/RcdrY\d+/)) {
+		self.states['record_bg'] = parseInt(data.match(/RcdrY(\d+)/)[1]);
+		self.checkFeedbacks('record_bg');
+		debug("recording change");
+		}
 	else {
 		debug("data nologin", data);
 	}
 };
 
-instance.prototype.init = function() {
-	var self = this;
-
-	debug = self.debug;
-	log = self.log;
-
-	self.init_tcp();
-};
 
 instance.prototype.init_tcp = function() {
 	var self = this;
@@ -94,16 +105,11 @@ instance.prototype.init_tcp = function() {
 		self.socket.on('error', function (err) {
 			debug("Network error", err);
 			self.log('error',"Network error: " + err.message);
+			self.login = false;
 		});
 
 		self.socket.on('connect', function () {
 			debug("Connected");
-			self.login = false;
-		});
-
-		self.socket.on('error', function (err) {
-			debug("Network error", err);
-			self.log('error',"Network error: " + err.message);
 			self.login = false;
 		});
 
@@ -138,6 +144,12 @@ instance.prototype.CHOICES_PRESET = [
 	{ label: 'layout preset', id: '7' }
 ]
 
+instance.prototype.CHOICES_RECORD = [
+	{ label: 'STOP', id: '0' },
+	{ label: 'START', id: '1' },
+	{ label: 'PAUSE', id: '2' }
+]
+
 // Return config fields for web config
 instance.prototype.config_fields = function () {
 	var self = this;
@@ -170,9 +182,54 @@ instance.prototype.destroy = function() {
 		self.socket.destroy();
 	}
 
+	self.states = {}
+
 	debug("destroy", self.id);
 };
 
+instance.prototype.init_feedbacks = function () {
+	var self = this
+	var feedbacks = {}
+
+	feedbacks['record_bg'] = {
+		label: 'Change colors for Record state',
+		description: 'If Record state specified is in use, change colors of the bank',
+		options: [
+			{
+				type: 'colorpicker',
+				label: 'Foreground color',
+				id: 'fg',
+				default: self.rgb(255, 255, 255)
+			},
+			{
+				type: 'colorpicker',
+				label: 'Background color',
+				id: 'bg',
+				default: self.rgb(0, 255, 0)
+			},
+			{
+				type: 'dropdown',
+				label: 'record',
+				id: 'record',
+				default: 1,
+				choices: self.CHOICES_RECORD
+			}
+		]
+	}
+	self.setFeedbackDefinitions(feedbacks)
+}
+
+instance.prototype.feedback = function (feedback, bank) {
+	var self = this
+
+	if (feedback.type === 'record_bg') {
+		if (self.states['record_bg'] === parseInt(feedback.options.record)) {
+			return { color: feedback.options.fg, bgcolor: feedback.options.bg }
+		}
+	}
+
+	return {}
+}
 instance.prototype.actions = function(system) {
 	var self = this;
 	var actions = {
@@ -242,32 +299,25 @@ instance.prototype.actions = function(system) {
 				regex: self.REGEX_NUMBER
 			}]
 		},
-		'start_rec': {
-			label: 'Start recording',
+		'record': {
+			label: 'start/stop/pause',
 			options: [{
-					label: 'start record',
-					id: 'start_rec',
+					label: 'record action',
+					id: 'record_action',
+					choices: self.CHOICES_RECORD,
+					default: '0',
 			}]
 		},
-		'stop_rec': {
-			label: 'Stop recording',
-			options: [{
-					label: 'stop record',
-					id: 'stop_rec',
-			}]
-		}
-		'pause_rec': {
-			label: 'Pause recording',
-			options: [{
-					label: 'Pause recording',
-					id: 'pause_rec',
-			}]
-		}
 		'extend_rec': {
 			label: 'Extend recording 5min',
 			options: [{
 					label: 'Extend recording 5min',
 					id: 'extend_rec',
+			}, {
+				type: 'textinput',
+				label: 'Duration in Mins 0 to 99',
+				id: 'duration',
+				regex: self.REGEX_NUMBER
 			}]
 		}
 	};
@@ -299,20 +349,12 @@ instance.prototype.action = function(action) {
 			cmd = opt.ps_type+"*"+opt.preset+".";
 			break;
 
-		case 'start_rec':
-			cmd = "\x1BY1RCDR";
+		case 'record':
+			cmd = "\x1BY"+opt.record_action+"RCDR";
 			break;
 
-		case 'stop_rec':
-			cmd = "\x1BY0RCDR";
-			break;
-		
-		case 'pause_rec':
-			cmd = "\x1BY2RCDR";
-			break;
-		
 		case 'extend_rec':
-			cmd = "\x1BE35RCDR";
+			cmd = "\x1BE"+opt.duration+"RCDR";
 			break;
 
 	}

@@ -13,5 +13,11 @@
 * **Recall Presets** Recall user, input & layout presets
 * **Start Recording** Start a recording
 * **Stop Recording** Stop a recording
+* **Pause Recording** Pause a recording
+* **Extend Recording** Extend a scheduled recording by X mins
+
+## Supported feebback
+
+* **Record state** start/stop/pause
 
 > .
