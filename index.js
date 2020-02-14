@@ -49,10 +49,17 @@ instance.prototype.incomingData = function(data) {
 	}
 
 	if (self.login === false && data.match("Password:")) {
-		self.log('error', "expected no password");
-		self.status(self.STATUS_ERROR, 'expected no password');
+		self.status(self.STATUS_WARNING,'Logging in');
+		self.socket.write(self.config.password+ "\r"); // Enter Password Set
 	}
 
+	// Match login sucess response from unit.
+	else if (self.login === false && data.match("Login")) {
+		self.login = true;
+		self.socket.write("\x1B3CV"+ "\r"); // Set Verbose mode to 3
+		self.status(self.STATUS_OK);
+		debug("logged in");
+	}
 	// Match expected response from unit.
 	else if (self.login === false && data.match("Streaming")) {
 		self.login = true;
@@ -169,7 +176,14 @@ instance.prototype.config_fields = function () {
 			width: 12,
 			default: '192.168.254.254',
 			regex: self.REGEX_IP
+		},
+		{
+			type: 'textinput',
+			id: 'password',
+			label: 'Admin or User Password',
+			width: 8
 		}
+
 	]
 };
 
