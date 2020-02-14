@@ -4,7 +4,7 @@
 
 ## Extra Information
 
-* Ensure no password it set.
+* Admin or User Password can be set if used
 * Extron telnet connection has a timeout default 5mins
 
 ## Supported commands
@@ -16,7 +16,7 @@
 * **Pause Recording** Pause a recording
 * **Extend Recording** Extend a scheduled recording by X mins
 
-## Supported feebback
+##Supported feebback
 
 * **Record state** start/stop/pause
 
