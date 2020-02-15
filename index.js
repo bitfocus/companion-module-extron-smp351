@@ -50,7 +50,7 @@ instance.prototype.incomingData = function(data) {
 
 	if (self.login === false && data.match("Password:")) {
 		self.status(self.STATUS_WARNING,'Logging in');
-		self.socket.write(self.config.password+ "\r"); // Enter Password Set
+		self.socket.write("\r" +self.config.password+ "\r"); // Enter Password Set
 	}
 
 	// Match login sucess response from unit.
