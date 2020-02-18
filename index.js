@@ -314,9 +314,10 @@ instance.prototype.actions = function(system) {
 			}]
 		},
 		'record': {
-			label: 'start/stop/pause',
+			label: 'Stop/Record/Pause',
 			options: [{
-					label: 'record action',
+					type: 'dropdown',
+					label: 'Action',
 					id: 'record_action',
 					choices: self.CHOICES_RECORD,
 					default: '0',
