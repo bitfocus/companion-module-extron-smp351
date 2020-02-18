@@ -330,7 +330,7 @@ instance.prototype.actions = function(system) {
 					id: 'extend_rec',
 			}, {
 				type: 'textinput',
-				label: 'Duration in mins (0 to 99)',
+				label: 'Duration in mins (0 to 60)',
 				id: 'duration',
 				regex: self.REGEX_NUMBER
 			}]
