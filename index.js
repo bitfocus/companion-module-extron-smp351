@@ -324,13 +324,13 @@ instance.prototype.actions = function(system) {
 			}]
 		},
 		'extend_rec': {
-			label: 'Extend recording 5min',
+			label: 'Extend recording',
 			options: [{
-					label: 'Extend recording 5min',
+					label: 'Scheduled recordings only',
 					id: 'extend_rec',
 			}, {
 				type: 'textinput',
-				label: 'Duration in Mins 0 to 99',
+				label: 'Duration in mins (0 to 99)',
 				id: 'duration',
 				regex: self.REGEX_NUMBER
 			}]
