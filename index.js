@@ -153,7 +153,7 @@ instance.prototype.CHOICES_PRESET = [
 
 instance.prototype.CHOICES_RECORD = [
 	{ label: 'STOP', id: '0' },
-	{ label: 'START', id: '1' },
+	{ label: 'RECORD', id: '1' },
 	{ label: 'PAUSE', id: '2' }
 ]
 
