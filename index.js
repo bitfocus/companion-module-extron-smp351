@@ -153,7 +153,7 @@ instance.prototype.CHOICES_PRESET = [
 
 instance.prototype.CHOICES_RECORD = [
 	{ label: 'STOP', id: '0' },
-	{ label: 'START', id: '1' },
+	{ label: 'RECORD', id: '1' },
 	{ label: 'PAUSE', id: '2' }
 ]
 
@@ -314,22 +314,23 @@ instance.prototype.actions = function(system) {
 			}]
 		},
 		'record': {
-			label: 'start/stop/pause',
+			label: 'Stop/Record/Pause',
 			options: [{
-					label: 'record action',
+					type: 'dropdown',
+					label: 'Action',
 					id: 'record_action',
 					choices: self.CHOICES_RECORD,
 					default: '0',
 			}]
 		},
 		'extend_rec': {
-			label: 'Extend recording 5min',
+			label: 'Extend recording',
 			options: [{
-					label: 'Extend recording 5min',
+					label: 'Scheduled recordings only',
 					id: 'extend_rec',
 			}, {
 				type: 'textinput',
-				label: 'Duration in Mins 0 to 99',
+				label: 'Duration in mins (0 to 60)',
 				id: 'duration',
 				regex: self.REGEX_NUMBER
 			}]
