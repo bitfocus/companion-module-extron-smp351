@@ -57,12 +57,14 @@ instance.prototype.incomingData = function(data) {
 	else if (self.login === false && data.match("Login")) {
 		self.login = true;
 		self.socket.write("\x1B3CV"+ "\r"); // Set Verbose mode to 3
+		self.socket.write("\x1BYRCDR"+ "\n"); // Request Record Status
 		self.status(self.STATUS_OK);
 		debug("logged in");
 	}
 	// Match expected response from unit.
 	else if (self.login === false && data.match("Streaming")) {
 		self.login = true;
+		self.socket.write("\x1BYRCDR"+ "\n"); // Request Record Status
 		self.status(self.STATUS_OK);
 		debug("logged in");
 	}
