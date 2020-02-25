@@ -1,6 +1,6 @@
 # Module for Extron SMP 351
 
-This module connects to the Extron H.264 Streaming Media Processor (SMP) 351 and allows you to login, send commands, and recieve feedback based on the status of the device.
+> This module connects to the Extron H.264 Streaming Media Processor (SMP) 351 and allows you to login, send commands, and recieve feedback based on the status of the device.
 
 ## Connecting
 
