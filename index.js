@@ -31,8 +31,8 @@ instance.prototype.init = function() {
 	debug = self.debug;
 	log = self.log;
 
-	self.states = {}
-	self.init_feedbacks()
+	self.states = {};
+	self.init_feedbacks();
 	self.init_variables();
 	self.init_tcp();
 };
@@ -75,7 +75,6 @@ instance.prototype.incomingData = function(data) {
 		self.login = false;
 		self.status(self.STATUS_WARNING,'Checking Connection');
 		self.socket.write("2I"+ "\n"); // should respond with model description eg: "Streaming Media Processor"
-		self.socket.write("36I"+ "\n");
 		debug("Checking Connection");
 		}
 	if (self.login === true) {
