@@ -23,3 +23,4 @@ This module connects to the Extron H.264 Streaming Media Processor (SMP) 351 and
 ## Supported button variables
 
 * **Record state** Stopped/Recording/Paused
+* **Time Remaining** Time remaining on a recording in hh:mm format
