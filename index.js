@@ -57,12 +57,14 @@ instance.prototype.incomingData = function(data) {
 	else if (self.login === false && data.match("Login")) {
 		self.login = true;
 		self.socket.write("\x1B3CV"+ "\r"); // Set Verbose mode to 3
+		self.socket.write("\x1BYRCDR"+ "\n"); // Request Record Status
 		self.status(self.STATUS_OK);
 		debug("logged in");
 	}
 	// Match expected response from unit.
 	else if (self.login === false && data.match("Streaming")) {
 		self.login = true;
+		self.socket.write("\x1BYRCDR"+ "\n"); // Request Record Status
 		self.status(self.STATUS_OK);
 		debug("logged in");
 	}
@@ -82,8 +84,17 @@ instance.prototype.incomingData = function(data) {
 	if (self.login === true && data.match(/RcdrY\d+/)) {
 		self.states['record_bg'] = parseInt(data.match(/RcdrY(\d+)/)[1]);
 		self.checkFeedbacks('record_bg');
-		self.setVariable('recordStatus', recordStatus);
 		debug("recording change");
+		if (self.states['record_bg'] === 2) {
+			recordStatus = 'Pasued';
+		} else if (self.states['record_bg'] === 1) {
+			recordStatus = 'Recording';
+		} else if (self.states['record_bg'] === 0) {
+			recordStatus = 'Stopped';
+		} else {
+			recordStatus= '';
+		}
+		self.setVariable('recordStatus', recordStatus);
 		}
 	else {
 		debug("data nologin", data);
@@ -251,13 +262,6 @@ instance.prototype.init_variables = function () {
 	var variables = [];
 
 	var recordStatus = '';
-	if (self.states['record_bg'] === 2) {
-		recordStatus = 'Pasued';
-	} else if (self.states['record_bg'] === 1) {
-		recordStatus = 'Recording';
-	} else if (self.states['record_bg'] === 0) {
-		recordStatus = 'Stopped';
-	}
 
 	variables.push({
 		label: 'Current recording status',
