@@ -58,6 +58,7 @@ instance.prototype.incomingData = function(data) {
 		self.login = true;
 		self.socket.write("\x1B3CV"+ "\r"); // Set Verbose mode to 3
 		self.socket.write("\x1BYRCDR"+ "\n"); // Request Record Status
+		self.socket.write("36I"+ "\n");
 		self.status(self.STATUS_OK);
 		debug("logged in");
 	}
@@ -65,6 +66,7 @@ instance.prototype.incomingData = function(data) {
 	else if (self.login === false && data.match("Streaming")) {
 		self.login = true;
 		self.socket.write("\x1BYRCDR"+ "\n"); // Request Record Status
+		self.socket.write("36I"+ "\n");
 		self.status(self.STATUS_OK);
 		debug("logged in");
 	}
@@ -73,11 +75,12 @@ instance.prototype.incomingData = function(data) {
 		self.login = false;
 		self.status(self.STATUS_WARNING,'Checking Connection');
 		self.socket.write("2I"+ "\n"); // should respond with model description eg: "Streaming Media Processor"
+		self.socket.write("36I"+ "\n");
 		debug("Checking Connection");
 		}
 	if (self.login === true) {
 		clearInterval(self.heartbeat_interval);
-		var beat_period = 180; // Seconds
+		var beat_period = 60; // Seconds
 		self.heartbeat_interval = setInterval(heartbeat, beat_period * 1000);
 	}
 	// Match recording state change expected response from unit.
@@ -95,6 +98,12 @@ instance.prototype.incomingData = function(data) {
 			recordStatus= 'Updating';
 		}
 		self.setVariable('recordStatus', recordStatus);
+		}
+	else if (self.login === true && data.includes("Inf36*")) {
+		self.states['time_remain'] = data.slice(15, -5);
+		debug("time change", data);
+		timeRemain = self.states['time_remain']
+		self.setVariable('timeRemain', timeRemain);
 		}
 	else {
 		debug("data nologin", data);
@@ -261,7 +270,8 @@ instance.prototype.init_variables = function () {
 	var self = this;
 	var variables = [];
 
-	var recordStatus = '';
+	var recordStatus = 'Updating';
+	var timeRemain = '00:00';
 
 	variables.push({
 		label: 'Current recording status',
@@ -269,6 +279,12 @@ instance.prototype.init_variables = function () {
 	});
 	this.setVariable('recordStatus', recordStatus);
 	
+	variables.push({
+		label: 'Time remaining on recording hh:mm',
+		name:  'timeRemain'
+	});
+	this.setVariable('timeRemain', timeRemain);
+
 	this.setVariableDefinitions(variables);
 }
 
