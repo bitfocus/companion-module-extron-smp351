@@ -92,7 +92,7 @@ instance.prototype.incomingData = function(data) {
 		} else if (self.states['record_bg'] === 0) {
 			recordStatus = 'Stopped';
 		} else {
-			recordStatus= '';
+			recordStatus= 'Updating';
 		}
 		self.setVariable('recordStatus', recordStatus);
 		}
