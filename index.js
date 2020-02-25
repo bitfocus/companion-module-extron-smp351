@@ -33,7 +33,7 @@ instance.prototype.init = function() {
 
 	self.states = {}
 	self.init_feedbacks()
-
+	self.init_variables();
 	self.init_tcp();
 };
 
@@ -82,6 +82,7 @@ instance.prototype.incomingData = function(data) {
 	if (self.login === true && data.match(/RcdrY\d+/)) {
 		self.states['record_bg'] = parseInt(data.match(/RcdrY(\d+)/)[1]);
 		self.checkFeedbacks('record_bg');
+		self.setVariable('recordStatus', recordStatus);
 		debug("recording change");
 		}
 	else {
@@ -244,6 +245,29 @@ instance.prototype.feedback = function (feedback, bank) {
 
 	return {}
 }
+
+instance.prototype.init_variables = function () {
+	var self = this;
+	var variables = [];
+
+	var recordStatus = '';
+	if (self.states['record_bg'] === 2) {
+		recordStatus = 'Pasued';
+	} else if (self.states['record_bg'] === 1) {
+		recordStatus = 'Recording';
+	} else if (self.states['record_bg'] === 0) {
+		recordStatus = 'Stopped';
+	}
+
+	variables.push({
+		label: 'Current recording status',
+		name:  'recordStatus'
+	});
+	this.setVariable('recordStatus', recordStatus);
+	
+	this.setVariableDefinitions(variables);
+}
+
 instance.prototype.actions = function(system) {
 	var self = this;
 	var actions = {
