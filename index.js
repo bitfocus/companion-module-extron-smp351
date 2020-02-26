@@ -31,9 +31,9 @@ instance.prototype.init = function() {
 	debug = self.debug;
 	log = self.log;
 
-	self.states = {}
-	self.init_feedbacks()
-
+	self.states = {};
+	self.init_feedbacks();
+	self.init_variables();
 	self.init_tcp();
 };
 
@@ -58,6 +58,7 @@ instance.prototype.incomingData = function(data) {
 		self.login = true;
 		self.socket.write("\x1B3CV"+ "\r"); // Set Verbose mode to 3
 		self.socket.write("\x1BYRCDR"+ "\n"); // Request Record Status
+		self.socket.write("36I"+ "\n");
 		self.status(self.STATUS_OK);
 		debug("logged in");
 	}
@@ -65,6 +66,7 @@ instance.prototype.incomingData = function(data) {
 	else if (self.login === false && data.match("Streaming")) {
 		self.login = true;
 		self.socket.write("\x1BYRCDR"+ "\n"); // Request Record Status
+		self.socket.write("36I"+ "\n");
 		self.status(self.STATUS_OK);
 		debug("logged in");
 	}
@@ -77,7 +79,7 @@ instance.prototype.incomingData = function(data) {
 		}
 	if (self.login === true) {
 		clearInterval(self.heartbeat_interval);
-		var beat_period = 180; // Seconds
+		var beat_period = 60; // Seconds
 		self.heartbeat_interval = setInterval(heartbeat, beat_period * 1000);
 	}
 	// Match recording state change expected response from unit.
@@ -85,6 +87,22 @@ instance.prototype.incomingData = function(data) {
 		self.states['record_bg'] = parseInt(data.match(/RcdrY(\d+)/)[1]);
 		self.checkFeedbacks('record_bg');
 		debug("recording change");
+		if (self.states['record_bg'] === 2) {
+			self.recordStatus = 'Pasued';
+		} else if (self.states['record_bg'] === 1) {
+			self.recordStatus = 'Recording';
+		} else if (self.states['record_bg'] === 0) {
+			self.recordStatus = 'Stopped';
+		} else {
+			self.recordStatus= 'Updating';
+		}
+		self.setVariable('recordStatus', self.recordStatus);
+		}
+	else if (self.login === true && data.includes("Inf36*")) {
+		self.states['time_remain'] = data.slice(15, -5);
+		debug("time change", data);
+		self.timeRemain = self.states['time_remain']
+		self.setVariable('timeRemain', self.timeRemain);
 		}
 	else {
 		debug("data nologin", data);
@@ -246,6 +264,29 @@ instance.prototype.feedback = function (feedback, bank) {
 
 	return {}
 }
+
+instance.prototype.init_variables = function () {
+	var self = this;
+	var variables = [];
+
+	var recordStatus = 'Updating';
+	var timeRemain = '00:00';
+
+	variables.push({
+		label: 'Current recording status',
+		name:  'recordStatus'
+	});
+	self.setVariable('recordStatus', recordStatus);
+	
+	variables.push({
+		label: 'Time remaining on recording hh:mm',
+		name:  'timeRemain'
+	});
+	self.setVariable('timeRemain', timeRemain);
+
+	self.setVariableDefinitions(variables);
+}
+
 instance.prototype.actions = function(system) {
 	var self = this;
 	var actions = {
