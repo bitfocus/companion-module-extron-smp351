@@ -88,21 +88,21 @@ instance.prototype.incomingData = function(data) {
 		self.checkFeedbacks('record_bg');
 		debug("recording change");
 		if (self.states['record_bg'] === 2) {
-			recordStatus = 'Pasued';
+			self.recordStatus = 'Pasued';
 		} else if (self.states['record_bg'] === 1) {
-			recordStatus = 'Recording';
+			self.recordStatus = 'Recording';
 		} else if (self.states['record_bg'] === 0) {
-			recordStatus = 'Stopped';
+			self.recordStatus = 'Stopped';
 		} else {
-			recordStatus= 'Updating';
+			self.recordStatus= 'Updating';
 		}
-		self.setVariable('recordStatus', recordStatus);
+		self.setVariable('recordStatus', self.recordStatus);
 		}
 	else if (self.login === true && data.includes("Inf36*")) {
 		self.states['time_remain'] = data.slice(15, -5);
 		debug("time change", data);
-		timeRemain = self.states['time_remain']
-		self.setVariable('timeRemain', timeRemain);
+		self.timeRemain = self.states['time_remain']
+		self.setVariable('timeRemain', self.timeRemain);
 		}
 	else {
 		debug("data nologin", data);
@@ -276,15 +276,15 @@ instance.prototype.init_variables = function () {
 		label: 'Current recording status',
 		name:  'recordStatus'
 	});
-	this.setVariable('recordStatus', recordStatus);
+	self.setVariable('recordStatus', recordStatus);
 	
 	variables.push({
 		label: 'Time remaining on recording hh:mm',
 		name:  'timeRemain'
 	});
-	this.setVariable('timeRemain', timeRemain);
+	self.setVariable('timeRemain', timeRemain);
 
-	this.setVariableDefinitions(variables);
+	self.setVariableDefinitions(variables);
 }
 
 instance.prototype.actions = function(system) {
