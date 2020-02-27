@@ -417,13 +417,6 @@ instance.prototype.action = function(action) {
 	}
 
 	if (cmd !== undefined) {
-			if (self.tcp !== undefined) {
-					debug('sending ', cmd, "to", self.tcp.host);
-					self.tcp.send(cmd);
-			}
-	}
-
-	if (cmd !== undefined) {
 
 		if (self.socket !== undefined && self.socket.connected) {
 			self.socket.write(cmd+"\n");
