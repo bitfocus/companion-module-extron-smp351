@@ -112,7 +112,6 @@ instance.prototype.incomingData = function(data) {
 
 instance.prototype.init_tcp = function() {
 	var self = this;
-	var receivebuffer = '';
 
 	if (self.socket !== undefined) {
 		self.socket.destroy();
@@ -149,12 +148,12 @@ instance.prototype.init_tcp = function() {
 		self.socket.on("iac", function(type, info) {
 			// tell remote we WONT do anything we're asked to DO
 			if (type == 'DO') {
-				socket.write(new Buffer([ 255, 252, info ]));
+				self.socket.write(new Buffer([ 255, 252, info ]));
 			}
 
 			// tell the remote DONT do whatever they WILL offer
 			if (type == 'WILL') {
-				socket.write(new Buffer([ 255, 254, info ]));
+				self.socket.write(new Buffer([ 255, 254, info ]));
 			}
 		});
 	}
@@ -277,7 +276,7 @@ instance.prototype.init_variables = function () {
 		name:  'recordStatus'
 	});
 	self.setVariable('recordStatus', recordStatus);
-	
+
 	variables.push({
 		label: 'Time remaining on recording hh:mm',
 		name:  'timeRemain'
