@@ -44,8 +44,8 @@ instance.prototype.incomingData = function(data) {
 	// Match part of the copyright response from unit when a connection is made.
 	if (self.login === false && data.match("Extron Electronics")) {
 		self.status(self.STATUS_WARNING,'Logging in');
-		self.socket.write("\x1B3CV"+ "\r"); // Set Verbose mode to 3
-		self.socket.write("2I"+ "\n"); // Query model description
+		self.socket.write("\x1B3CV\r"); // Set Verbose mode to 3
+		self.socket.write("2I\n"); // Query model description
 	}
 
 	if (self.login === false && data.match("Password:")) {
@@ -54,19 +54,19 @@ instance.prototype.incomingData = function(data) {
 	}
 
 	// Match login sucess response from unit.
-	else if (self.login === false && data.match("Login")) {
+	else if (self.login === false && data.match(/Login/)) {
 		self.login = true;
-		self.socket.write("\x1B3CV"+ "\r"); // Set Verbose mode to 3
-		self.socket.write("\x1BYRCDR"+ "\n"); // Request Record Status
-		self.socket.write("36I"+ "\n");
+		self.socket.write("\x1B3CV\r"); // Set Verbose mode to 3
+		self.socket.write("\x1BYRCDR\n"); // Request Record Status
+		self.socket.write("36I\n");
 		self.status(self.STATUS_OK);
 		debug("logged in");
 	}
 	// Match expected response from unit.
-	else if (self.login === false && data.match("Streaming")) {
+	else if (self.login === false && data.match(/Streaming/)) {
 		self.login = true;
-		self.socket.write("\x1BYRCDR"+ "\n"); // Request Record Status
-		self.socket.write("36I"+ "\n");
+		self.socket.write("\x1BYRCDR\n"); // Request Record Status
+		self.socket.write("36I\n");
 		self.status(self.STATUS_OK);
 		debug("logged in");
 	}
@@ -74,7 +74,7 @@ instance.prototype.incomingData = function(data) {
 	function heartbeat() {
 		self.login = false;
 		self.status(self.STATUS_WARNING,'Checking Connection');
-		self.socket.write("2I"+ "\n"); // should respond with model description eg: "Streaming Media Processor"
+		self.socket.write("2I\n"); // should respond with model description eg: "Streaming Media Processor"
 		debug("Checking Connection");
 		}
 	if (self.login === true) {
@@ -98,7 +98,7 @@ instance.prototype.incomingData = function(data) {
 		}
 		self.setVariable('recordStatus', self.recordStatus);
 		}
-	else if (self.login === true && data.includes("Inf36*")) {
+	else if (self.login === true && data.includes(/Inf36*/)) {
 		self.states['time_remain'] = data.slice(15, -5);
 		debug("time change", data);
 		self.timeRemain = self.states['time_remain']
@@ -112,7 +112,6 @@ instance.prototype.incomingData = function(data) {
 
 instance.prototype.init_tcp = function() {
 	var self = this;
-	var receivebuffer = '';
 
 	if (self.socket !== undefined) {
 		self.socket.destroy();
@@ -149,12 +148,12 @@ instance.prototype.init_tcp = function() {
 		self.socket.on("iac", function(type, info) {
 			// tell remote we WONT do anything we're asked to DO
 			if (type == 'DO') {
-				socket.write(new Buffer([ 255, 252, info ]));
+				self.socket.write(new Buffer([ 255, 252, info ]));
 			}
 
 			// tell the remote DONT do whatever they WILL offer
 			if (type == 'WILL') {
-				socket.write(new Buffer([ 255, 254, info ]));
+				self.socket.write(new Buffer([ 255, 254, info ]));
 			}
 		});
 	}
@@ -216,7 +215,7 @@ instance.prototype.destroy = function() {
 		self.socket.destroy();
 	}
 
-	self.states = {}
+	self.states = {};
 
 	debug("destroy", self.id);
 };
@@ -277,7 +276,7 @@ instance.prototype.init_variables = function () {
 		name:  'recordStatus'
 	});
 	self.setVariable('recordStatus', recordStatus);
-	
+
 	variables.push({
 		label: 'Time remaining on recording hh:mm',
 		name:  'timeRemain'
