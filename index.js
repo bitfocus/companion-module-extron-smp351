@@ -98,7 +98,7 @@ instance.prototype.incomingData = function(data) {
 		}
 		self.setVariable('recordStatus', self.recordStatus);
 		}
-	else if (self.login === true && data.includes(/Inf36*/)) {
+	else if (self.login === true && data.match(/^Inf36.+/)) {
 		self.states['time_remain'] = data.slice(15, -5);
 		debug("time change", data);
 		self.timeRemain = self.states['time_remain']
