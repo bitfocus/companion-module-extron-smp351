@@ -1,11 +1,9 @@
-var tcp = require('../../tcp');
 var instance_skel = require('../../instance_skel');
 var TelnetSocket = require('../../telnet');
 var debug;
 var log;
 
-
-function instance(system, id, config) {
+function instance (system, id, config) {
 	var self = this;
 
 	// Request id counter
@@ -13,19 +11,19 @@ function instance(system, id, config) {
 	self.login = false;
 	// super-constructor
 	instance_skel.apply(this, arguments);
-	self.status(1,'Initializing');
+	self.status(1, 'Initializing');
 	self.actions(); // export actions
 
 	return self;
 }
 
-instance.prototype.updateConfig = function(config) {
+instance.prototype.updateConfig = function (config) {
 	var self = this;
 	self.config = config;
 	self.init_tcp();
 };
 
-instance.prototype.init = function() {
+instance.prototype.init = function () {
 	var self = this;
 
 	debug = self.debug;
@@ -37,46 +35,44 @@ instance.prototype.init = function() {
 	self.init_tcp();
 };
 
-instance.prototype.incomingData = function(data) {
+instance.prototype.incomingData = function (data) {
 	var self = this;
 	debug(data);
 
 	// Match part of the copyright response from unit when a connection is made.
-	if (self.login === false && data.match("Extron Electronics")) {
-		self.status(self.STATUS_WARNING,'Logging in');
-		self.socket.write("\x1B3CV\r"); // Set Verbose mode to 3
-		self.socket.write("2I\n"); // Query model description
+	if (self.login === false && data.match(/Extron Electronics/)) {
+		self.status(self.STATUS_WARNING, 'Logging in');
+		self.socket.write('\x1B3CV\r'); // Set Verbose mode to 3
+		self.socket.write('2I\n'); // Query model description
 	}
-
-	if (self.login === false && data.match("Password:")) {
-		self.status(self.STATUS_WARNING,'Logging in');
-		self.socket.write("\r" +self.config.password+ "\r"); // Enter Password Set
+	if (self.login === false && data.match(/Password:/)) {
+		self.status(self.STATUS_WARNING, 'Logging in');
+		self.socket.write('\r' + self.config.password + '\r'); // Enter Password Set
 	}
-
 	// Match login sucess response from unit.
 	else if (self.login === false && data.match(/Login/)) {
 		self.login = true;
-		self.socket.write("\x1B3CV\r"); // Set Verbose mode to 3
-		self.socket.write("\x1BYRCDR\n"); // Request Record Status
-		self.socket.write("36I\n");
+		self.socket.write('\x1B3CV\r'); // Set Verbose mode to 3
+		self.socket.write('\x1BYRCDR\n'); // Request Record Status
+		self.socket.write('36I\n');
 		self.status(self.STATUS_OK);
-		debug("logged in");
+		debug('logged in');
 	}
 	// Match expected response from unit.
 	else if (self.login === false && data.match(/Streaming/)) {
 		self.login = true;
-		self.socket.write("\x1BYRCDR\n"); // Request Record Status
-		self.socket.write("36I\n");
+		self.socket.write('\x1BYRCDR\n'); // Request Record Status
+		self.socket.write('36I\n');
 		self.status(self.STATUS_OK);
-		debug("logged in");
+		debug('logged in');
 	}
 	// Heatbeat to keep connection alive
-	function heartbeat() {
+	function heartbeat () {
 		self.login = false;
-		self.status(self.STATUS_WARNING,'Checking Connection');
-		self.socket.write("2I\n"); // should respond with model description eg: "Streaming Media Processor"
-		debug("Checking Connection");
-		}
+		self.status(self.STATUS_WARNING, 'Checking Connection');
+		self.socket.write('2I\n'); // should respond with model description eg: "Streaming Media Processor"
+		debug('Checking Connection');
+	}
 	if (self.login === true) {
 		clearInterval(self.heartbeat_interval);
 		var beat_period = 60; // Seconds
@@ -86,7 +82,7 @@ instance.prototype.incomingData = function(data) {
 	if (self.login === true && data.match(/RcdrY\d+/)) {
 		self.states['record_bg'] = parseInt(data.match(/RcdrY(\d+)/)[1]);
 		self.checkFeedbacks('record_bg');
-		debug("recording change");
+		debug('recording change');
 		if (self.states['record_bg'] === 2) {
 			self.recordStatus = 'Pasued';
 		} else if (self.states['record_bg'] === 1) {
@@ -94,23 +90,22 @@ instance.prototype.incomingData = function(data) {
 		} else if (self.states['record_bg'] === 0) {
 			self.recordStatus = 'Stopped';
 		} else {
-			self.recordStatus= 'Updating';
+			self.recordStatus = 'Updating';
 		}
 		self.setVariable('recordStatus', self.recordStatus);
-		}
+	}
 	else if (self.login === true && data.match(/^Inf36.+/)) {
 		self.states['time_remain'] = data.slice(15, -5);
-		debug("time change", data);
-		self.timeRemain = self.states['time_remain']
+		debug('time change', data);
+		self.timeRemain = self.states['time_remain'];
 		self.setVariable('timeRemain', self.timeRemain);
-		}
+	}
 	else {
-		debug("data nologin", data);
+		debug('data nologin', data);
 	}
 };
 
-
-instance.prototype.init_tcp = function() {
+instance.prototype.init_tcp = function () {
 	var self = this;
 
 	if (self.socket !== undefined) {
@@ -129,23 +124,23 @@ instance.prototype.init_tcp = function() {
 		});
 
 		self.socket.on('error', function (err) {
-			debug("Network error", err);
-			self.log('error',"Network error: " + err.message);
+			debug('Network error', err);
+			self.log('error', 'Network error: ' + err.message);
 			self.login = false;
 		});
 
 		self.socket.on('connect', function () {
-			debug("Connected");
+			debug('Connected');
 			self.login = false;
 		});
 
 		// if we get any data, display it to stdout
-		self.socket.on("data", function(buffer) {
+		self.socket.on("data", function (buffer) {
 			var indata = buffer.toString("utf8");
 			self.incomingData(indata);
 		});
 
-		self.socket.on("iac", function(type, info) {
+		self.socket.on("iac", function (type, info) {
 			// tell remote we WONT do anything we're asked to DO
 			if (type == 'DO') {
 				self.socket.write(new Buffer([ 255, 252, info ]));
@@ -162,19 +157,27 @@ instance.prototype.init_tcp = function() {
 instance.prototype.CHOICES_CHANNEL = [
 	{ label: 'A', id: '1' },
 	{ label: 'B', id: '2' }
-],
+];
 
 instance.prototype.CHOICES_PRESET = [
-	{ label: 'user preset', id: '1' },
-	{ label: 'input preset', id: '2' },
-	{ label: 'layout preset', id: '7' }
-]
+	{ label: 'User preset', id: '1' },
+	{ label: 'Input preset', id: '2' },
+	{ label: 'Stream preset', id: '3' },
+	{ label: 'Encoder preset', id: '4' },
+	{ label: 'Layout preset', id: '7' }
+];
 
 instance.prototype.CHOICES_RECORD = [
 	{ label: 'STOP', id: '0' },
 	{ label: 'RECORD', id: '1' },
 	{ label: 'PAUSE', id: '2' }
-]
+];
+
+instance.prototype.CHOICES_ENCODER = [
+	{ label: 'A', id: '1' },
+	{ label: 'B', id: '2' },
+	{ label: 'Confidence A', id: '3' }
+];
 
 // Return config fields for web config
 instance.prototype.config_fields = function () {
@@ -202,14 +205,13 @@ instance.prototype.config_fields = function () {
 			label: 'Admin or User Password',
 			width: 8
 		}
-
 	]
 };
 
 // When module gets deleted
-instance.prototype.destroy = function() {
+instance.prototype.destroy = function () {
 	var self = this;
-	clearInterval (self.heartbeat_interval); //Stop Heartbeat
+	clearInterval(self.heartbeat_interval); // Stop Heartbeat
 
 	if (self.socket !== undefined) {
 		self.socket.destroy();
@@ -217,12 +219,12 @@ instance.prototype.destroy = function() {
 
 	self.states = {};
 
-	debug("destroy", self.id);
+	debug('destroy', self.id);
 };
 
 instance.prototype.init_feedbacks = function () {
-	var self = this
-	var feedbacks = {}
+	var self = this;
+	var feedbacks = {};
 
 	feedbacks['record_bg'] = {
 		label: 'Change colors for Record state',
@@ -253,15 +255,15 @@ instance.prototype.init_feedbacks = function () {
 }
 
 instance.prototype.feedback = function (feedback, bank) {
-	var self = this
+	var self = this;
 
 	if (feedback.type === 'record_bg') {
 		if (self.states['record_bg'] === parseInt(feedback.options.record)) {
-			return { color: feedback.options.fg, bgcolor: feedback.options.bg }
+			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
 		}
 	}
 
-	return {}
+	return {};
 }
 
 instance.prototype.init_variables = function () {
@@ -273,48 +275,49 @@ instance.prototype.init_variables = function () {
 
 	variables.push({
 		label: 'Current recording status',
-		name:  'recordStatus'
+		name: 'recordStatus'
 	});
 	self.setVariable('recordStatus', recordStatus);
 
 	variables.push({
 		label: 'Time remaining on recording hh:mm',
-		name:  'timeRemain'
+		name: 'timeRemain'
 	});
 	self.setVariable('timeRemain', timeRemain);
 
 	self.setVariableDefinitions(variables);
 }
 
-instance.prototype.actions = function(system) {
+instance.prototype.actions = function (system) {
 	var self = this;
 	var actions = {
 		'route': {
 			label: 'Route input to output channel A or B',
 			options: [{
-					type: 'textinput',
-					label: 'input',
-					id: 'input',
-					regex: self.REGEX_NUMBER
+				type: 'textinput',
+				label: 'input',
+				id: 'input',
+				regex: self.REGEX_NUMBER
 			}, {
 				type: 'dropdown',
 				label: 'output channel',
 				id: 'channel',
-				choices: self.CHOICES_CHANNEL,
+				choices: self.CHOICES_CHANNEL
 			}]
 		},
 		'recall_ps_channel': {
 			label: 'Recall a saved user preset',
 			options: [{
-					label: 'user preset id',
-					id: 'ps_type',
-					choices: self.CHOICES_PRESET,
-					default: '1',
+				label: 'User preset',
+				id: 'ps_type',
+				choices: self.CHOICES_PRESET,
+				default: '1'
 			}, {
 				type: 'dropdown',
 				label: 'output channel',
 				id: 'channel',
 				choices: self.CHOICES_CHANNEL,
+				default: '1'
 			}, {
 				type: 'textinput',
 				label: 'user preset',
@@ -325,10 +328,10 @@ instance.prototype.actions = function(system) {
 		'recall_ps_input': {
 			label: 'Recall a saved input preset',
 			options: [{
-					label: 'input preset id',
-					id: 'ps_type',
-					choices: self.CHOICES_PRESET,
-					default: '2',
+				label: 'Input preset',
+				id: 'ps_type',
+				choices: self.CHOICES_PRESET,
+				default: '2'
 			}, {
 				type: 'textinput',
 				label: 'input preset',
@@ -339,15 +342,56 @@ instance.prototype.actions = function(system) {
 				label: 'output channel',
 				id: 'channel',
 				choices: self.CHOICES_CHANNEL,
+				default: '1'
+			}]
+		},
+		'recall_ps_stream': {
+			label: 'Recall a saved stream preset',
+			options: [{
+				label: 'Stream preset',
+				id: 'ps_type',
+				choices: self.CHOICES_PRESET,
+				default: '3'
+			}, {
+				type: 'dropdown',
+				label: 'Encoder',
+				id: 'encoder',
+				choices: self.CHOICES_ENCODER,
+				default: '1'
+			}, {
+				type: 'textinput',
+				label: 'Stream preset',
+				id: 'preset',
+				regex: self.REGEX_NUMBER
+			}]
+		},
+		'recall_ps_encoder': {
+			label: 'Recall a saved encoder preset',
+			options: [{
+				label: 'Encoder preset',
+				id: 'ps_type',
+				choices: self.CHOICES_PRESET,
+				default: '4'
+			}, {
+				type: 'dropdown',
+				label: 'Encoder',
+				id: 'encoder',
+				choices: self.CHOICES_ENCODER,
+				default: '1'
+			}, {
+				type: 'textinput',
+				label: 'Encoder preset',
+				id: 'preset',
+				regex: self.REGEX_NUMBER
 			}]
 		},
 		'recall_ps_layout': {
 			label: 'Recall a saved layout preset',
 			options: [{
-					label: 'layout preset id',
-					id: 'ps_type',
-					choices: self.CHOICES_PRESET,
-					default: '7',
+				label: 'Layout preset',
+				id: 'ps_type',
+				choices: self.CHOICES_PRESET,
+				default: '7'
 			}, {
 				type: 'textinput',
 				label: 'layout preset',
@@ -358,23 +402,42 @@ instance.prototype.actions = function(system) {
 		'record': {
 			label: 'Stop/Record/Pause',
 			options: [{
-					type: 'dropdown',
-					label: 'Action',
-					id: 'record_action',
-					choices: self.CHOICES_RECORD,
-					default: '0',
+				type: 'dropdown',
+				label: 'Action',
+				id: 'record_action',
+				choices: self.CHOICES_RECORD,
+				default: '0'
 			}]
 		},
 		'extend_rec': {
 			label: 'Extend recording',
 			options: [{
-					label: 'Scheduled recordings only',
-					id: 'extend_rec',
+				label: 'Scheduled recordings only',
+				id: 'extend_rec'
 			}, {
 				type: 'textinput',
 				label: 'Duration in mins (0 to 60)',
 				id: 'duration',
 				regex: self.REGEX_NUMBER
+			}]
+		},
+		'rtmp_stream': {
+			label: 'RTMP Stream',
+			options: [{
+				type: 'dropdown',
+				label: 'Stream selection',
+				id: 'rtmp_stream',
+				choices: self.CHOICES_ENCODER,
+				default: '1'
+			}, {
+				type: 'dropdown',
+				label: 'On / Off',
+				id: 'state',
+				choices: [
+					{ id: '0', label: 'Off' },
+					{ id: '1', label: 'On' }
+				],
+				default: '0'
 			}]
 		}
 	};
@@ -382,8 +445,7 @@ instance.prototype.actions = function(system) {
 	self.setActions(actions);
 }
 
-instance.prototype.action = function(action) {
-
+instance.prototype.action = function (action) {
 	var self = this;
 	var id = action.action;
 	var opt = action.options;
@@ -391,39 +453,48 @@ instance.prototype.action = function(action) {
 
 	switch (id) {
 		case 'route':
-			cmd = opt.input+"*"+opt.channel+"!";
+			cmd = opt.input + '*' + opt.channel + '!';
 			break;
 
 		case 'recall_ps_channel':
-			cmd = opt.ps_type+"*"+opt.channel+"*"+opt.preset+".";
+			cmd = opt.ps_type + '*' + opt.channel + '*' + opt.preset + '.';
 			break;
 
 		case 'recall_ps_input':
-			cmd = opt.ps_type+"*"+opt.preset+"*"+opt.channel+".";
+			cmd = opt.ps_type + '*' + opt.preset + '*' + opt.channel + '.';
+			break;
+
+		case 'recall_ps_stream':
+			cmd = opt.ps_type + '*' + opt.encoder + '*' + opt.preset + '.';
+			break;
+
+		case 'recall_ps_encoder':
+			cmd = opt.ps_type + '*' + opt.encoder + '*' + opt.preset + '.';
 			break;
 
 		case 'recall_ps_layout':
-			cmd = opt.ps_type+"*"+opt.preset+".";
+			cmd = opt.ps_type + '*' + opt.preset + '.';
 			break;
 
 		case 'record':
-			cmd = "\x1BY"+opt.record_action+"RCDR";
+			cmd = '\x1BY' + opt.record_action + 'RCDR';
 			break;
 
 		case 'extend_rec':
-			cmd = "\x1BE"+opt.duration+"RCDR";
+			cmd = '\x1BE' + opt.duration + 'RCDR';
 			break;
 
+		case 'rtmp_stream':
+			cmd = '\x1BE' + opt.rtmp_stream + '*' + opt.state + 'STRC';
+			break;
 	}
 
 	if (cmd !== undefined) {
-
 		if (self.socket !== undefined && self.socket.connected) {
-			self.socket.write(cmd+"\n");
+			self.socket.write(cmd + '\n');
 		} else {
 			debug('Socket not connected :(');
 		}
-
 	}
 };
 
