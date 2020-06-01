@@ -485,7 +485,7 @@ instance.prototype.action = function (action) {
 			break;
 
 		case 'rtmp_stream':
-			cmd = '\x1BE' + opt.rtmp_stream + '*' + opt.state + 'STRC';
+			cmd = '\x1BE' + opt.rtmp_stream + '*' + opt.state + 'RTMP';
 			break;
 	}
 
