@@ -45,6 +45,7 @@ instance.prototype.incomingData = function (data) {
 		self.socket.write('\x1B3CV\r'); // Set Verbose mode to 3
 		self.socket.write('2I\n'); // Query model description
 	}
+
 	if (self.login === false && data.match(/Password:/)) {
 		self.status(self.STATUS_WARNING, 'Logging in');
 		self.socket.write('\r' + self.config.password + '\r'); // Enter Password Set
@@ -54,6 +55,12 @@ instance.prototype.incomingData = function (data) {
 		self.login = true;
 		self.socket.write('\x1B3CV\r'); // Set Verbose mode to 3
 		self.socket.write('\x1BYRCDR\n'); // Request Record Status
+		self.socket.write('\x1BS1*1RTMP\n'); // Request Pri A Stream Status
+		self.socket.write('\x1BS1*2RTMP\n'); // Request Pri B Stream Status
+		self.socket.write('\x1BS1*3RTMP\n'); // Request Pri Confidence A Stream Status
+		self.socket.write('\x1BS2*1RTMP\n'); // Request Sec A Stream Status
+		self.socket.write('\x1BS2*2RTMP\n'); // Request Sec B Stream Status
+		self.socket.write('\x1BS2*3RTMP\n'); // Request Sec Confidence A Stream Status
 		self.socket.write('36I\n');
 		self.status(self.STATUS_OK);
 		debug('logged in');
@@ -62,9 +69,15 @@ instance.prototype.incomingData = function (data) {
 	else if (self.login === false && data.match(/Streaming/)) {
 		self.login = true;
 		self.socket.write('\x1BYRCDR\n'); // Request Record Status
+		self.socket.write('\x1BS1*1RTMP\n'); // Request Pri A Stream Status
+		self.socket.write('\x1BS1*2RTMP\n'); // Request Pri B Stream Status
+		self.socket.write('\x1BS1*3RTMP\n'); // Request Pri Confidence A Stream Status
+		self.socket.write('\x1BS2*1RTMP\n'); // Request Sec A Stream Status
+		self.socket.write('\x1BS2*2RTMP\n'); // Request Sec B Stream Status
+		self.socket.write('\x1BS2*3RTMP\n'); // Request Sec Confidence A Stream Status
 		self.socket.write('36I\n');
 		self.status(self.STATUS_OK);
-		debug('logged in');
+		debug('Heartbeat done');
 	}
 	// Heatbeat to keep connection alive
 	function heartbeat () {
@@ -84,7 +97,7 @@ instance.prototype.incomingData = function (data) {
 		self.checkFeedbacks('record_bg');
 		debug('recording change');
 		if (self.states['record_bg'] === 2) {
-			self.recordStatus = 'Pasued';
+			self.recordStatus = 'Paused';
 		} else if (self.states['record_bg'] === 1) {
 			self.recordStatus = 'Recording';
 		} else if (self.states['record_bg'] === 0) {
@@ -100,6 +113,44 @@ instance.prototype.incomingData = function (data) {
 		self.timeRemain = self.states['time_remain'];
 		self.setVariable('timeRemain', self.timeRemain);
 	}
+
+	// Match stream state change expected response from unit.
+	if (self.login === true && data.match(/RtmpE1\*\d+/)) {
+		self.states['rtmpStatus_a_bg'] = parseInt(data.match(/RtmpE1\*(\d+)/)[1]);
+		self.checkFeedbacks('rtmpStatus_a_bg');
+		debug('stream change');
+	}
+
+	if (self.login === true && data.match(/RtmpS1\*1\*\d+/)) {
+		self.states['rtmpStatus_a_bg'] = parseInt(data.match(/RtmpS1\*1\*(\d+)/)[1]);
+		self.checkFeedbacks('rtmpStatus_a_bg');
+		debug('stream change');
+	}
+
+	if (self.login === true && data.match(/RtmpE2\*\d+/)) {
+		self.states['rtmpStatus_b_bg'] = parseInt(data.match(/RtmpE2\*(\d+)/)[1]);
+		self.checkFeedbacks('rtmpStatus_b_bg');
+		debug('stream change');
+	}
+
+	if (self.login === true && data.match(/RtmpS1\*2\*\d+/)) {
+		self.states['rtmpStatus_b_bg'] = parseInt(data.match(/RtmpS1\*2\*(\d+)/)[1]);
+		self.checkFeedbacks('rtmpStatus_b_bg');
+		debug('stream change');
+	}
+
+	if (self.login === true && data.match(/RtmpE3\*\d+/)) {
+		self.states['rtmpStatus_ca_bg'] = parseInt(data.match(/RtmpE3\*(\d+)/)[1]);
+		self.checkFeedbacks('rtmpStatus_ca_bg');
+		debug('stream change');
+	}
+
+	if (self.login === true && data.match(/RtmpS1\*3\*\d+/)) {
+		self.states['rtmpStatus_ca_bg'] = parseInt(data.match(/RtmpS1\*3\*(\d+)/)[1]);
+		self.checkFeedbacks('rtmpStatus_ca_bg');
+		debug('stream change');
+	}
+
 	else {
 		debug('data nologin', data);
 	}
@@ -179,6 +230,11 @@ instance.prototype.CHOICES_ENCODER = [
 	{ label: 'Confidence A', id: '3' }
 ];
 
+instance.prototype.CHOICES_ONOFF = [
+	{ label: 'OFF', id: '0' },
+	{ label: 'ON', id: '1' }
+];
+
 // Return config fields for web config
 instance.prototype.config_fields = function () {
 	var self = this;
@@ -251,8 +307,87 @@ instance.prototype.init_feedbacks = function () {
 			}
 		]
 	}
-	self.setFeedbackDefinitions(feedbacks)
-}
+
+	feedbacks['rtmpStatus_a_bg'] = {
+		label: 'Change colors for RTMP Stream A',
+		description: 'If RTMP Stream A is Live, change colors of the bank',
+		options: [
+			{
+				type: 'colorpicker',
+				label: 'Foreground color',
+				id: 'fg',
+				default: self.rgb(255, 255, 255)
+			},
+			{
+				type: 'colorpicker',
+				label: 'Background color',
+				id: 'bg',
+				default: self.rgb(0, 255, 0)
+			},
+			{
+				type: 'dropdown',
+				label: 'On/Off',
+				id: 'onoff',
+				default: 0,
+				choices: self.CHOICES_ONOFF
+			}
+		]
+	}
+
+	feedbacks['rtmpStatus_b_bg'] = {
+		label: 'Change colors for RTMP Stream B',
+		description: 'If RTMP Stream B is Live, change colors of the bank',
+		options: [
+			{
+				type: 'colorpicker',
+				label: 'Foreground color',
+				id: 'fg',
+				default: self.rgb(255, 255, 255)
+			},
+			{
+				type: 'colorpicker',
+				label: 'Background color',
+				id: 'bg',
+				default: self.rgb(0, 255, 0)
+			},
+			{
+				type: 'dropdown',
+				label: 'On/Off',
+				id: 'onoff',
+				default: 0,
+				choices: self.CHOICES_ONOFF
+			}
+		]
+	}
+
+	feedbacks['rtmpStatus_ca_bg'] = {
+		label: 'Change colors for RTMP Stream Confidence A',
+		description: 'If RTMP Stream Confidence A is Live, change colors of the bank',
+		options: [
+			{
+				type: 'colorpicker',
+				label: 'Foreground color',
+				id: 'fg',
+				default: self.rgb(255, 255, 255)
+			},
+			{
+				type: 'colorpicker',
+				label: 'Background color',
+				id: 'bg',
+				default: self.rgb(0, 255, 0)
+			},
+			{
+				type: 'dropdown',
+				label: 'On/Off',
+				id: 'onoff',
+				default: 0,
+				choices: self.CHOICES_ONOFF
+			}
+		]
+	}
+
+	self.setFeedbackDefinitions(feedbacks);
+};
 
 instance.prototype.feedback = function (feedback, bank) {
 	var self = this;
@@ -263,8 +398,26 @@ instance.prototype.feedback = function (feedback, bank) {
 		}
 	}
 
+	if (feedback.type === 'rtmpStatus_a_bg') {
+		if (self.states['rtmpStatus_a_bg'] === parseInt(feedback.options.onoff)) {
+			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+		}
+	}
+
+	if (feedback.type === 'rtmpStatus_b_bg') {
+		if (self.states['rtmpStatus_b_bg'] === parseInt(feedback.options.onoff)) {
+			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+		}
+	}
+
+	if (feedback.type === 'rtmpStatus_ca_bg') {
+		if (self.states['rtmpStatus_ca_bg'] === parseInt(feedback.options.onoff)) {
+			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+		}
+	}
+
 	return {};
-}
+};
 
 instance.prototype.init_variables = function () {
 	var self = this;
@@ -431,19 +584,16 @@ instance.prototype.actions = function (system) {
 				default: '1'
 			}, {
 				type: 'dropdown',
-				label: 'On / Off',
-				id: 'state',
-				choices: [
-					{ id: '0', label: 'Off' },
-					{ id: '1', label: 'On' }
-				],
+				label: 'On/Off',
+				id: 'onoff',
+				choices: self.CHOICES_ONOFF,
 				default: '0'
 			}]
 		}
 	};
 
 	self.setActions(actions);
-}
+};
 
 instance.prototype.action = function (action) {
 	var self = this;
@@ -485,7 +635,7 @@ instance.prototype.action = function (action) {
 			break;
 
 		case 'rtmp_stream':
-			cmd = '\x1BE' + opt.rtmp_stream + '*' + opt.state + 'RTMP';
+			cmd = '\x1BE' + opt.rtmp_stream + '*' + opt.onoff + 'RTMP';
 			break;
 	}
 
