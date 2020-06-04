@@ -118,37 +118,55 @@ instance.prototype.incomingData = function (data) {
 	if (self.login === true && data.match(/RtmpE1\*\d+/)) {
 		self.states['rtmpStatus_a_bg'] = parseInt(data.match(/RtmpE1\*(\d+)/)[1]);
 		self.checkFeedbacks('rtmpStatus_a_bg');
-		debug('stream change');
+		debug('stream a change');
 	}
 
 	if (self.login === true && data.match(/RtmpS1\*1\*\d+/)) {
 		self.states['rtmpStatus_a_bg'] = parseInt(data.match(/RtmpS1\*1\*(\d+)/)[1]);
 		self.checkFeedbacks('rtmpStatus_a_bg');
-		debug('stream change');
+		debug('primary stream a change');
+	}
+
+	if (self.login === true && data.match(/RtmpS2\*1\*\d+/)) {
+		self.states['rtmpStatus_a2_bg'] = parseInt(data.match(/RtmpS2\*1\*(\d+)/)[1]);
+		self.checkFeedbacks('rtmpStatus_a2_bg');
+		debug('secondary stream a change');
 	}
 
 	if (self.login === true && data.match(/RtmpE2\*\d+/)) {
 		self.states['rtmpStatus_b_bg'] = parseInt(data.match(/RtmpE2\*(\d+)/)[1]);
 		self.checkFeedbacks('rtmpStatus_b_bg');
-		debug('stream change');
+		debug('stream b change');
 	}
 
 	if (self.login === true && data.match(/RtmpS1\*2\*\d+/)) {
 		self.states['rtmpStatus_b_bg'] = parseInt(data.match(/RtmpS1\*2\*(\d+)/)[1]);
 		self.checkFeedbacks('rtmpStatus_b_bg');
-		debug('stream change');
+		debug('primary stream b change');
+	}
+
+	if (self.login === true && data.match(/RtmpS2\*2\*\d+/)) {
+		self.states['rtmpStatus_b2_bg'] = parseInt(data.match(/RtmpS2\*2\*(\d+)/)[1]);
+		self.checkFeedbacks('rtmpStatus_b2_bg');
+		debug('secondary stream b change');
 	}
 
 	if (self.login === true && data.match(/RtmpE3\*\d+/)) {
 		self.states['rtmpStatus_ca_bg'] = parseInt(data.match(/RtmpE3\*(\d+)/)[1]);
 		self.checkFeedbacks('rtmpStatus_ca_bg');
-		debug('stream change');
+		debug('stream confidence a change');
 	}
 
 	if (self.login === true && data.match(/RtmpS1\*3\*\d+/)) {
 		self.states['rtmpStatus_ca_bg'] = parseInt(data.match(/RtmpS1\*3\*(\d+)/)[1]);
 		self.checkFeedbacks('rtmpStatus_ca_bg');
-		debug('stream change');
+		debug('primary stream confidence a change');
+	}
+
+	if (self.login === true && data.match(/RtmpS2\*3\*\d+/)) {
+		self.states['rtmpStatus_ca2_bg'] = parseInt(data.match(/RtmpS2\*3\*(\d+)/)[1]);
+		self.checkFeedbacks('rtmpStatus_ca2_bg');
+		debug('secondary stream confidence a change');
 	}
 
 	else {
@@ -309,8 +327,8 @@ instance.prototype.init_feedbacks = function () {
 	}
 
 	feedbacks['rtmpStatus_a_bg'] = {
-		label: 'Change colors for RTMP Stream A',
-		description: 'If RTMP Stream A is Live, change colors of the bank',
+		label: 'Change colors for Primary RTMP Stream A',
+		description: 'If Primary RTMP Stream A is Live, change colors of the bank',
 		options: [
 			{
 				type: 'colorpicker',
@@ -335,8 +353,8 @@ instance.prototype.init_feedbacks = function () {
 	}
 
 	feedbacks['rtmpStatus_b_bg'] = {
-		label: 'Change colors for RTMP Stream B',
-		description: 'If RTMP Stream B is Live, change colors of the bank',
+		label: 'Change colors for Primary RTMP Stream B',
+		description: 'If Primary RTMP Stream B is Live, change colors of the bank',
 		options: [
 			{
 				type: 'colorpicker',
@@ -361,8 +379,86 @@ instance.prototype.init_feedbacks = function () {
 	}
 
 	feedbacks['rtmpStatus_ca_bg'] = {
-		label: 'Change colors for RTMP Stream Confidence A',
-		description: 'If RTMP Stream Confidence A is Live, change colors of the bank',
+		label: 'Change colors for Primary RTMP Stream Confidence A',
+		description: 'If Primary RTMP Stream Confidence A is Live, change colors of the bank',
+		options: [
+			{
+				type: 'colorpicker',
+				label: 'Foreground color',
+				id: 'fg',
+				default: self.rgb(255, 255, 255)
+			},
+			{
+				type: 'colorpicker',
+				label: 'Background color',
+				id: 'bg',
+				default: self.rgb(0, 255, 0)
+			},
+			{
+				type: 'dropdown',
+				label: 'On/Off',
+				id: 'onoff',
+				default: 0,
+				choices: self.CHOICES_ONOFF
+			}
+		]
+	}
+
+	feedbacks['rtmpStatus_a2_bg'] = {
+		label: 'Change colors for Secondary RTMP Stream A',
+		description: 'If Secondary RTMP Stream A is Live, change colors of the bank',
+		options: [
+			{
+				type: 'colorpicker',
+				label: 'Foreground color',
+				id: 'fg',
+				default: self.rgb(255, 255, 255)
+			},
+			{
+				type: 'colorpicker',
+				label: 'Background color',
+				id: 'bg',
+				default: self.rgb(0, 255, 0)
+			},
+			{
+				type: 'dropdown',
+				label: 'On/Off',
+				id: 'onoff',
+				default: 0,
+				choices: self.CHOICES_ONOFF
+			}
+		]
+	}
+
+	feedbacks['rtmpStatus_b2_bg'] = {
+		label: 'Change colors for Secondary RTMP Stream B',
+		description: 'If Secondary RTMP Stream B is Live, change colors of the bank',
+		options: [
+			{
+				type: 'colorpicker',
+				label: 'Foreground color',
+				id: 'fg',
+				default: self.rgb(255, 255, 255)
+			},
+			{
+				type: 'colorpicker',
+				label: 'Background color',
+				id: 'bg',
+				default: self.rgb(0, 255, 0)
+			},
+			{
+				type: 'dropdown',
+				label: 'On/Off',
+				id: 'onoff',
+				default: 0,
+				choices: self.CHOICES_ONOFF
+			}
+		]
+	}
+
+	feedbacks['rtmpStatus_ca2_bg'] = {
+		label: 'Change colors for Secondary RTMP Stream Confidence A',
+		description: 'If Secondary RTMP Stream Confidence A is Live, change colors of the bank',
 		options: [
 			{
 				type: 'colorpicker',
@@ -412,6 +508,24 @@ instance.prototype.feedback = function (feedback, bank) {
 
 	if (feedback.type === 'rtmpStatus_ca_bg') {
 		if (self.states['rtmpStatus_ca_bg'] === parseInt(feedback.options.onoff)) {
+			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+		}
+	}
+
+	if (feedback.type === 'rtmpStatus_a2_bg') {
+		if (self.states['rtmpStatus_a2_bg'] === parseInt(feedback.options.onoff)) {
+			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+		}
+	}
+
+	if (feedback.type === 'rtmpStatus_b2_bg') {
+		if (self.states['rtmpStatus_b2_bg'] === parseInt(feedback.options.onoff)) {
+			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+		}
+	}
+
+	if (feedback.type === 'rtmpStatus_ca2_bg') {
+		if (self.states['rtmpStatus_ca2_bg'] === parseInt(feedback.options.onoff)) {
 			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
 		}
 	}
