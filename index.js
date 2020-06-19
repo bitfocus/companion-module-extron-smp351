@@ -58,9 +58,9 @@ instance.prototype.incomingData = function (data) {
 		self.socket.write('\x1BS1*1RTMP\n'); // Request Pri A Stream Status
 		self.socket.write('\x1BS1*2RTMP\n'); // Request Pri B Stream Status
 		self.socket.write('\x1BS1*3RTMP\n'); // Request Pri Confidence A Stream Status
-		self.socket.write('\x1BS2*1RTMP\n'); // Request Sec A Stream Status
-		self.socket.write('\x1BS2*2RTMP\n'); // Request Sec B Stream Status
-		self.socket.write('\x1BS2*3RTMP\n'); // Request Sec Confidence A Stream Status
+		self.socket.write('\x1BS2*1RTMP\n'); // Request Bac A Stream Status
+		self.socket.write('\x1BS2*2RTMP\n'); // Request Bac B Stream Status
+		self.socket.write('\x1BS2*3RTMP\n'); // Request Bac Confidence A Stream Status
 		self.socket.write('36I\n');
 		self.status(self.STATUS_OK);
 		debug('logged in');
@@ -72,9 +72,9 @@ instance.prototype.incomingData = function (data) {
 		self.socket.write('\x1BS1*1RTMP\n'); // Request Pri A Stream Status
 		self.socket.write('\x1BS1*2RTMP\n'); // Request Pri B Stream Status
 		self.socket.write('\x1BS1*3RTMP\n'); // Request Pri Confidence A Stream Status
-		self.socket.write('\x1BS2*1RTMP\n'); // Request Sec A Stream Status
-		self.socket.write('\x1BS2*2RTMP\n'); // Request Sec B Stream Status
-		self.socket.write('\x1BS2*3RTMP\n'); // Request Sec Confidence A Stream Status
+		self.socket.write('\x1BS2*1RTMP\n'); // Request Bac A Stream Status
+		self.socket.write('\x1BS2*2RTMP\n'); // Request Bac B Stream Status
+		self.socket.write('\x1BS2*3RTMP\n'); // Request Bac Confidence A Stream Status
 		self.socket.write('36I\n');
 		self.status(self.STATUS_OK);
 		debug('Heartbeat done');
@@ -130,7 +130,7 @@ instance.prototype.incomingData = function (data) {
 	if (self.login === true && data.match(/RtmpS2\*1\*\d+/)) {
 		self.states['rtmpStatus_a2_bg'] = parseInt(data.match(/RtmpS2\*1\*(\d+)/)[1]);
 		self.checkFeedbacks('rtmpStatus_a2_bg');
-		debug('secondary stream a change');
+		debug('backup stream a change');
 	}
 
 	if (self.login === true && data.match(/RtmpE2\*\d+/)) {
@@ -148,7 +148,7 @@ instance.prototype.incomingData = function (data) {
 	if (self.login === true && data.match(/RtmpS2\*2\*\d+/)) {
 		self.states['rtmpStatus_b2_bg'] = parseInt(data.match(/RtmpS2\*2\*(\d+)/)[1]);
 		self.checkFeedbacks('rtmpStatus_b2_bg');
-		debug('secondary stream b change');
+		debug('backup stream b change');
 	}
 
 	if (self.login === true && data.match(/RtmpE3\*\d+/)) {
@@ -166,7 +166,7 @@ instance.prototype.incomingData = function (data) {
 	if (self.login === true && data.match(/RtmpS2\*3\*\d+/)) {
 		self.states['rtmpStatus_ca2_bg'] = parseInt(data.match(/RtmpS2\*3\*(\d+)/)[1]);
 		self.checkFeedbacks('rtmpStatus_ca2_bg');
-		debug('secondary stream confidence a change');
+		debug('backup stream confidence a change');
 	}
 
 	else {
@@ -405,8 +405,8 @@ instance.prototype.init_feedbacks = function () {
 	}
 
 	feedbacks['rtmpStatus_a2_bg'] = {
-		label: 'Change colors for Secondary RTMP Stream A',
-		description: 'If Secondary RTMP Stream A is Live, change colors of the bank',
+		label: 'Change colors for Backup RTMP Stream A',
+		description: 'If Backup RTMP Stream A is Live, change colors of the bank',
 		options: [
 			{
 				type: 'colorpicker',
@@ -431,8 +431,8 @@ instance.prototype.init_feedbacks = function () {
 	}
 
 	feedbacks['rtmpStatus_b2_bg'] = {
-		label: 'Change colors for Secondary RTMP Stream B',
-		description: 'If Secondary RTMP Stream B is Live, change colors of the bank',
+		label: 'Change colors for Backup RTMP Stream B',
+		description: 'If Backup RTMP Stream B is Live, change colors of the bank',
 		options: [
 			{
 				type: 'colorpicker',
@@ -457,8 +457,8 @@ instance.prototype.init_feedbacks = function () {
 	}
 
 	feedbacks['rtmpStatus_ca2_bg'] = {
-		label: 'Change colors for Secondary RTMP Stream Confidence A',
-		description: 'If Secondary RTMP Stream Confidence A is Live, change colors of the bank',
+		label: 'Change colors for Backup RTMP Stream Confidence A',
+		description: 'If Backup RTMP Stream Confidence A is Live, change colors of the bank',
 		options: [
 			{
 				type: 'colorpicker',

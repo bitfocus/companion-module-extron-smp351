@@ -15,10 +15,12 @@
 * **Stop Recording** Stop a recording
 * **Pause Recording** Pause a recording
 * **Extend Recording** Extend a scheduled recording by X mins
+* **RTMP Stream** Start/Stop
 
 ## Supported feedback
 
 * **Record state** Stop/Record/Pause
+* **Stream Primary/Backup state** On/Off
 
 ## Supported button variables
 
