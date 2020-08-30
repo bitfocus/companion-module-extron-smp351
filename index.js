@@ -108,10 +108,15 @@ instance.prototype.incomingData = function (data) {
 		self.setVariable('recordStatus', self.recordStatus);
 	}
 	else if (self.login === true && data.match(/^Inf36.+/)) {
-		self.states['time_remain'] = data.slice(15, -5);
-		debug('time change', data);
-		self.timeRemain = self.states['time_remain'];
+		if (self.states['record_bg'] === 0) {
+			self.states['time_remain'] = '00:00:00'
+		} else {
+			self.states['time_remain'] = data.slice(data.length -10);
+			debug("time change", data);
+			}
+		self.timeRemain = self.states['time_remain']
 		self.setVariable('timeRemain', self.timeRemain);
+		}
 	}
 
 	// Match stream state change expected response from unit.
