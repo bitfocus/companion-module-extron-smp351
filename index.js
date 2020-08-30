@@ -82,7 +82,6 @@ instance.prototype.incomingData = function (data) {
 	// Heatbeat to keep connection alive
 	function heartbeat () {
 		self.login = false;
-		self.status(self.STATUS_WARNING, 'Checking Connection');
 		self.socket.write('2I\n'); // should respond with model description eg: "Streaming Media Processor"
 		debug('Checking Connection');
 	}
