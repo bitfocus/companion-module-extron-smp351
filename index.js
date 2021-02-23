@@ -550,7 +550,7 @@ instance.prototype.init_variables = function () {
 	self.setVariable('recordStatus', recordStatus);
 
 	variables.push({
-		label: 'Time remaining on recording hh:mm',
+		label: 'Time remaining on recording hh:mm:ss',
 		name: 'timeRemain'
 	});
 	self.setVariable('timeRemain', timeRemain);
