@@ -87,7 +87,11 @@ instance.prototype.incomingData = function (data) {
 	}
 	if (self.login === true) {
 		clearInterval(self.heartbeat_interval);
-		var beat_period = 5; // Seconds
+		if (self.recordStatus === 'Recording') {
+			var beat_period = 1;
+		} else {
+			var beat_period = 5; // Seconds
+		}
 		self.heartbeat_interval = setInterval(heartbeat, beat_period * 1000);
 	}
 	// Match recording state change expected response from unit.
