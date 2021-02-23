@@ -541,7 +541,7 @@ instance.prototype.init_variables = function () {
 	var variables = [];
 
 	var recordStatus = 'Updating';
-	var timeRemain = '00:00';
+	var timeRemain = '00:00:00';
 
 	variables.push({
 		label: 'Current recording status',
