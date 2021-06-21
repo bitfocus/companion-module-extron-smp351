@@ -23,6 +23,20 @@ instance.prototype.updateConfig = function (config) {
 	self.init_tcp();
 };
 
+instance.GetUpgradeScripts = function() {
+	return [
+		instance_skel.CreateConvertToBooleanFeedbackUpgradeScript({
+			'record_bg': true,
+			'rtmpStatus_a_bg': true,
+			'rtmpStatus_b_bg': true,
+			'rtmpStatus_ca_bg': true,
+			'rtmpStatus_a2_bg': true,
+			'rtmpStatus_b2_bg': true,
+			'rtmpStatus_ca2_bg': true
+		}),
+	]
+}
+
 instance.prototype.init = function () {
 	var self = this;
 
@@ -308,24 +322,17 @@ instance.prototype.init_feedbacks = function () {
 	var feedbacks = {};
 
 	feedbacks['record_bg'] = {
-		label: 'Change colors for Record state',
-		description: 'If Record state specified is in use, change colors of the bank',
+		type: 'boolean',
+		label: 'Record Status',
+		description: 'If the record state specified is in use, change the style of the button',
+		style: {
+			color: self.rgb(255, 255, 255),
+			bgcolor: self.rgb(200, 0, 0)
+		},
 		options: [
 			{
-				type: 'colorpicker',
-				label: 'Foreground color',
-				id: 'fg',
-				default: self.rgb(255, 255, 255)
-			},
-			{
-				type: 'colorpicker',
-				label: 'Background color',
-				id: 'bg',
-				default: self.rgb(0, 255, 0)
-			},
-			{
 				type: 'dropdown',
-				label: 'record',
+				label: 'Status',
 				id: 'record',
 				default: 1,
 				choices: self.CHOICES_RECORD
@@ -334,21 +341,14 @@ instance.prototype.init_feedbacks = function () {
 	}
 
 	feedbacks['rtmpStatus_a_bg'] = {
-		label: 'Change colors for Primary RTMP Stream A',
-		description: 'If Primary RTMP Stream A is Live, change colors of the bank',
+		type: 'boolean',
+		label: 'Primary RTMP Stream A Status',
+		description: 'If Primary RTMP Stream A is Live, change the style of the button',
+		style: {
+			color: self.rgb(255, 255, 255),
+			bgcolor: self.rgb(0, 255, 0)
+		},
 		options: [
-			{
-				type: 'colorpicker',
-				label: 'Foreground color',
-				id: 'fg',
-				default: self.rgb(255, 255, 255)
-			},
-			{
-				type: 'colorpicker',
-				label: 'Background color',
-				id: 'bg',
-				default: self.rgb(0, 255, 0)
-			},
 			{
 				type: 'dropdown',
 				label: 'On/Off',
@@ -360,21 +360,14 @@ instance.prototype.init_feedbacks = function () {
 	}
 
 	feedbacks['rtmpStatus_b_bg'] = {
-		label: 'Change colors for Primary RTMP Stream B',
-		description: 'If Primary RTMP Stream B is Live, change colors of the bank',
+		type: 'boolean',
+		label: 'Primary RTMP Stream B Status',
+		description: 'If Primary RTMP Stream B is Live, change the style of the button',
+		style: {
+			color: self.rgb(255, 255, 255),
+			bgcolor: self.rgb(0, 255, 0)
+		},
 		options: [
-			{
-				type: 'colorpicker',
-				label: 'Foreground color',
-				id: 'fg',
-				default: self.rgb(255, 255, 255)
-			},
-			{
-				type: 'colorpicker',
-				label: 'Background color',
-				id: 'bg',
-				default: self.rgb(0, 255, 0)
-			},
 			{
 				type: 'dropdown',
 				label: 'On/Off',
@@ -386,21 +379,14 @@ instance.prototype.init_feedbacks = function () {
 	}
 
 	feedbacks['rtmpStatus_ca_bg'] = {
-		label: 'Change colors for Primary RTMP Stream Confidence A',
-		description: 'If Primary RTMP Stream Confidence A is Live, change colors of the bank',
+		type: 'boolean',
+		label: 'Primary RTMP Stream Confidence A Status',
+		description: 'If Primary RTMP Stream Confidence A is Live, change the style of the button',
+		style: {
+			color: self.rgb(255, 255, 255),
+			bgcolor: self.rgb(0, 255, 0)
+		},
 		options: [
-			{
-				type: 'colorpicker',
-				label: 'Foreground color',
-				id: 'fg',
-				default: self.rgb(255, 255, 255)
-			},
-			{
-				type: 'colorpicker',
-				label: 'Background color',
-				id: 'bg',
-				default: self.rgb(0, 255, 0)
-			},
 			{
 				type: 'dropdown',
 				label: 'On/Off',
@@ -412,21 +398,14 @@ instance.prototype.init_feedbacks = function () {
 	}
 
 	feedbacks['rtmpStatus_a2_bg'] = {
-		label: 'Change colors for Backup RTMP Stream A',
-		description: 'If Backup RTMP Stream A is Live, change colors of the bank',
+		type: 'boolean',
+		label: 'Backup RTMP Stream A Status',
+		description: 'If Backup RTMP Stream A is Live, change the style of the button',
+		style: {
+			color: self.rgb(255, 255, 255),
+			bgcolor: self.rgb(0, 255, 0)
+		},
 		options: [
-			{
-				type: 'colorpicker',
-				label: 'Foreground color',
-				id: 'fg',
-				default: self.rgb(255, 255, 255)
-			},
-			{
-				type: 'colorpicker',
-				label: 'Background color',
-				id: 'bg',
-				default: self.rgb(0, 255, 0)
-			},
 			{
 				type: 'dropdown',
 				label: 'On/Off',
@@ -438,21 +417,14 @@ instance.prototype.init_feedbacks = function () {
 	}
 
 	feedbacks['rtmpStatus_b2_bg'] = {
-		label: 'Change colors for Backup RTMP Stream B',
-		description: 'If Backup RTMP Stream B is Live, change colors of the bank',
+		type: 'boolean',
+		label: 'Backup RTMP Stream B Status',
+		description: 'If Backup RTMP Stream B is Live, change the style of the button',
+		style: {
+			color: self.rgb(255, 255, 255),
+			bgcolor: self.rgb(0, 255, 0)
+		},
 		options: [
-			{
-				type: 'colorpicker',
-				label: 'Foreground color',
-				id: 'fg',
-				default: self.rgb(255, 255, 255)
-			},
-			{
-				type: 'colorpicker',
-				label: 'Background color',
-				id: 'bg',
-				default: self.rgb(0, 255, 0)
-			},
 			{
 				type: 'dropdown',
 				label: 'On/Off',
@@ -464,21 +436,14 @@ instance.prototype.init_feedbacks = function () {
 	}
 
 	feedbacks['rtmpStatus_ca2_bg'] = {
-		label: 'Change colors for Backup RTMP Stream Confidence A',
-		description: 'If Backup RTMP Stream Confidence A is Live, change colors of the bank',
+		type: 'boolean',
+		label: 'RTMP Stream Confidence A Status',
+		description: 'If Backup RTMP Stream Confidence A is Live, change the style of the button',
+		style: {
+			color: self.rgb(255, 255, 255),
+			bgcolor: self.rgb(0, 255, 0)
+		},
 		options: [
-			{
-				type: 'colorpicker',
-				label: 'Foreground color',
-				id: 'fg',
-				default: self.rgb(255, 255, 255)
-			},
-			{
-				type: 'colorpicker',
-				label: 'Background color',
-				id: 'bg',
-				default: self.rgb(0, 255, 0)
-			},
 			{
 				type: 'dropdown',
 				label: 'On/Off',
@@ -497,47 +462,47 @@ instance.prototype.feedback = function (feedback, bank) {
 
 	if (feedback.type === 'record_bg') {
 		if (self.states['record_bg'] === parseInt(feedback.options.record)) {
-			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+			return true
 		}
 	}
 
 	if (feedback.type === 'rtmpStatus_a_bg') {
 		if (self.states['rtmpStatus_a_bg'] === parseInt(feedback.options.onoff)) {
-			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+			return true
 		}
 	}
 
 	if (feedback.type === 'rtmpStatus_b_bg') {
 		if (self.states['rtmpStatus_b_bg'] === parseInt(feedback.options.onoff)) {
-			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+			return true
 		}
 	}
 
 	if (feedback.type === 'rtmpStatus_ca_bg') {
 		if (self.states['rtmpStatus_ca_bg'] === parseInt(feedback.options.onoff)) {
-			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+			return true
 		}
 	}
 
 	if (feedback.type === 'rtmpStatus_a2_bg') {
 		if (self.states['rtmpStatus_a2_bg'] === parseInt(feedback.options.onoff)) {
-			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+			return true
 		}
 	}
 
 	if (feedback.type === 'rtmpStatus_b2_bg') {
 		if (self.states['rtmpStatus_b2_bg'] === parseInt(feedback.options.onoff)) {
-			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+			return true
 		}
 	}
 
 	if (feedback.type === 'rtmpStatus_ca2_bg') {
 		if (self.states['rtmpStatus_ca2_bg'] === parseInt(feedback.options.onoff)) {
-			return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+			return true
 		}
 	}
 
-	return {};
+	return false
 };
 
 instance.prototype.init_variables = function () {
