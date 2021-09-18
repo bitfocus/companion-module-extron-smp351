@@ -14,7 +14,7 @@
 * **Start Recording** Start a recording
 * **Stop Recording** Stop a recording
 * **Pause Recording** Pause a recording
-* **Extend Recording** Extend a scheduled recording by X mins
+* **Extend Scheduled Recording** Extend a scheduled recording by 1 - 60 minutes
 * **RTMP Stream** Start/Stop
 
 ## Supported feedback

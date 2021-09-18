@@ -649,15 +649,15 @@ instance.prototype.actions = function (system) {
 			}]
 		},
 		'extend_rec': {
-			label: 'Extend recording',
+			label: 'Extend Scheduled Recording',
 			options: [{
-				label: 'Scheduled recordings only',
-				id: 'extend_rec'
-			}, {
-				type: 'textinput',
-				label: 'Duration in mins (0 to 60)',
+				type: 'number',
+				label: 'Duration to extend (1 to 60 min)',
 				id: 'duration',
-				regex: self.REGEX_NUMBER
+				default: 5,
+				min: 1,
+				max: 60,
+				range: false,
 			}]
 		},
 		'rtmp_stream': {
