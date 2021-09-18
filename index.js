@@ -249,13 +249,13 @@ instance.prototype.CHOICES_CHANNEL = [
 	{ label: 'B', id: '2' }
 ];
 
-instance.prototype.CHOICES_PRESET = [
-	{ label: 'User preset', id: '1' },
-	{ label: 'Input preset', id: '2' },
-	{ label: 'Stream preset', id: '3' },
-	{ label: 'Encoder preset', id: '4' },
-	{ label: 'Layout preset', id: '7' }
-];
+instance.prototype.CHOICES_PRESET = {
+	userPreset: 1,
+	inputPreset: 2,
+	streamPreset: 3,
+	encoderPreset: 4,
+	layoutPreset: 7,
+}
 
 instance.prototype.CHOICES_RECORD = [
 	{ label: 'STOP', id: '0' },
@@ -547,11 +547,6 @@ instance.prototype.actions = function (system) {
 		'recall_ps_channel': {
 			label: 'Recall a saved user preset',
 			options: [{
-				label: 'User preset',
-				id: 'ps_type',
-				choices: self.CHOICES_PRESET,
-				default: '1'
-			}, {
 				type: 'dropdown',
 				label: 'output channel',
 				id: 'channel',
@@ -567,11 +562,6 @@ instance.prototype.actions = function (system) {
 		'recall_ps_input': {
 			label: 'Recall a saved input preset',
 			options: [{
-				label: 'Input preset',
-				id: 'ps_type',
-				choices: self.CHOICES_PRESET,
-				default: '2'
-			}, {
 				type: 'textinput',
 				label: 'input preset',
 				id: 'preset',
@@ -587,11 +577,6 @@ instance.prototype.actions = function (system) {
 		'recall_ps_stream': {
 			label: 'Recall a saved stream preset',
 			options: [{
-				label: 'Stream preset',
-				id: 'ps_type',
-				choices: self.CHOICES_PRESET,
-				default: '3'
-			}, {
 				type: 'dropdown',
 				label: 'Encoder',
 				id: 'encoder',
@@ -607,11 +592,6 @@ instance.prototype.actions = function (system) {
 		'recall_ps_encoder': {
 			label: 'Recall a saved encoder preset',
 			options: [{
-				label: 'Encoder preset',
-				id: 'ps_type',
-				choices: self.CHOICES_PRESET,
-				default: '4'
-			}, {
 				type: 'dropdown',
 				label: 'Encoder',
 				id: 'encoder',
@@ -627,11 +607,6 @@ instance.prototype.actions = function (system) {
 		'recall_ps_layout': {
 			label: 'Recall a saved layout preset',
 			options: [{
-				label: 'Layout preset',
-				id: 'ps_type',
-				choices: self.CHOICES_PRESET,
-				default: '7'
-			}, {
 				type: 'textinput',
 				label: 'layout preset',
 				id: 'preset',
@@ -693,23 +668,24 @@ instance.prototype.action = function (action) {
 			break;
 
 		case 'recall_ps_channel':
-			cmd = opt.ps_type + '*' + opt.channel + '*' + opt.preset + '.';
+			cmd = self.CHOICES_PRESET.userPreset + '*' + opt.channel + '*' + opt.preset + '.';
+			self.log('error', cmd)
 			break;
 
 		case 'recall_ps_input':
-			cmd = opt.ps_type + '*' + opt.preset + '*' + opt.channel + '.';
+			cmd = self.CHOICES_PRESET.inputPreset + '*' + opt.preset + '*' + opt.channel + '.';
 			break;
 
 		case 'recall_ps_stream':
-			cmd = opt.ps_type + '*' + opt.encoder + '*' + opt.preset + '.';
+			cmd = self.CHOICES_PRESET.streamPreset + '*' + opt.encoder + '*' + opt.preset + '.';
 			break;
 
 		case 'recall_ps_encoder':
-			cmd = opt.ps_type + '*' + opt.encoder + '*' + opt.preset + '.';
+			cmd = self.CHOICES_PRESET.encoderPreset + '*' + opt.encoder + '*' + opt.preset + '.';
 			break;
 
 		case 'recall_ps_layout':
-			cmd = opt.ps_type + '*' + opt.preset + '.';
+			cmd = self.CHOICES_PRESET.layoutPreset + '*' + opt.preset + '.';
 			break;
 
 		case 'record':
