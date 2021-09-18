@@ -258,9 +258,9 @@ instance.prototype.CHOICES_PRESET = {
 }
 
 instance.prototype.CHOICES_RECORD = [
-	{ label: 'STOP', id: '0' },
-	{ label: 'RECORD', id: '1' },
-	{ label: 'PAUSE', id: '2' }
+	{ label: 'Stop', id: '0' },
+	{ label: 'Record', id: '1' },
+	{ label: 'Pause', id: '2' }
 ];
 
 instance.prototype.CHOICES_ENCODER = [
@@ -534,44 +534,51 @@ instance.prototype.actions = function (system) {
 			label: 'Route input to output channel A or B',
 			options: [{
 				type: 'textinput',
-				label: 'input',
+				label: 'Input',
 				id: 'input',
 				regex: self.REGEX_NUMBER
 			}, {
 				type: 'dropdown',
-				label: 'output channel',
+				label: 'Output Channel',
 				id: 'channel',
-				choices: self.CHOICES_CHANNEL
+				choices: self.CHOICES_CHANNEL, 
+				default: '1'
 			}]
 		},
 		'recall_ps_channel': {
 			label: 'Recall a saved user preset',
 			options: [{
 				type: 'dropdown',
-				label: 'output channel',
+				label: 'Output Channel',
 				id: 'channel',
 				choices: self.CHOICES_CHANNEL,
 				default: '1'
 			}, {
-				type: 'textinput',
-				label: 'user preset',
+				type: 'number',
+				label: 'User Preset',
 				id: 'preset',
-				regex: self.REGEX_NUMBER
+				default: 1,
+				min: 1,
+				max: 16,
+				range: false,
 			}]
 		},
 		'recall_ps_input': {
 			label: 'Recall a saved input preset',
 			options: [{
-				type: 'textinput',
-				label: 'input preset',
-				id: 'preset',
-				regex: self.REGEX_NUMBER
-			}, {
 				type: 'dropdown',
-				label: 'output channel',
+				label: 'Output Channel',
 				id: 'channel',
 				choices: self.CHOICES_CHANNEL,
 				default: '1'
+			},	{
+				type: 'number',
+				label: 'Input Preset',
+				id: 'preset',
+				default: 1,
+				min: 1,
+				max: 128,
+				range: false,
 			}]
 		},
 		'recall_ps_stream': {
@@ -583,10 +590,13 @@ instance.prototype.actions = function (system) {
 				choices: self.CHOICES_ENCODER,
 				default: '1'
 			}, {
-				type: 'textinput',
-				label: 'Stream preset',
+				type: 'number',
+				label: 'Stream Preset',
 				id: 'preset',
-				regex: self.REGEX_NUMBER
+				default: 1,
+				min: 1,
+				max: 16,
+				range: false,
 			}]
 		},
 		'recall_ps_encoder': {
@@ -598,19 +608,25 @@ instance.prototype.actions = function (system) {
 				choices: self.CHOICES_ENCODER,
 				default: '1'
 			}, {
-				type: 'textinput',
-				label: 'Encoder preset',
+				type: 'number',
+				label: 'Encoder Preset',
 				id: 'preset',
-				regex: self.REGEX_NUMBER
+				default: 1,
+				min: 1,
+				max: 16,
+				range: false,
 			}]
 		},
 		'recall_ps_layout': {
 			label: 'Recall a saved layout preset',
 			options: [{
-				type: 'textinput',
-				label: 'layout preset',
+				type: 'number',
+				label: 'Layout Preset',
 				id: 'preset',
-				regex: self.REGEX_NUMBER
+				default: 1,
+				min: 1,
+				max: 16,
+				range: false,
 			}]
 		},
 		'record': {
@@ -639,7 +655,7 @@ instance.prototype.actions = function (system) {
 			label: 'RTMP Stream',
 			options: [{
 				type: 'dropdown',
-				label: 'Stream selection',
+				label: 'Stream',
 				id: 'rtmp_stream',
 				choices: self.CHOICES_ENCODER,
 				default: '1'
@@ -669,7 +685,6 @@ instance.prototype.action = function (action) {
 
 		case 'recall_ps_channel':
 			cmd = self.CHOICES_PRESET.userPreset + '*' + opt.channel + '*' + opt.preset + '.';
-			self.log('error', cmd)
 			break;
 
 		case 'recall_ps_input':
