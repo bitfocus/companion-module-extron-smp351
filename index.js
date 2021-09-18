@@ -64,7 +64,7 @@ instance.prototype.incomingData = function (data) {
 		self.status(self.STATUS_WARNING, 'Logging in');
 		self.socket.write('\r' + self.config.password + '\r'); // Enter Password Set
 	}
-	// Match login sucess response from unit.
+	// Match login success response from unit.
 	else if (self.login === false && data.match(/Login/)) {
 		self.login = true;
 		self.socket.write('\x1B3CV\r'); // Set Verbose mode to 3
@@ -93,7 +93,7 @@ instance.prototype.incomingData = function (data) {
 		self.status(self.STATUS_OK);
 		debug('Heartbeat done');
 	}
-	// Heatbeat to keep connection alive
+	// Heartbeat to keep connection alive
 	function heartbeat () {
 		self.login = false;
 		self.socket.write('2I\n'); // should respond with model description eg: "Streaming Media Processor"
@@ -191,7 +191,7 @@ instance.prototype.incomingData = function (data) {
 	}
 
 	else {
-		debug('data nologin', data);
+		debug('data no login', data);
 	}
 };
 
@@ -226,8 +226,8 @@ instance.prototype.init_tcp = function () {
 
 		// if we get any data, display it to stdout
 		self.socket.on("data", function (buffer) {
-			var indata = buffer.toString("utf8");
-			self.incomingData(indata);
+			var inData = buffer.toString("utf8");
+			self.incomingData(inData);
 		});
 
 		self.socket.on("iac", function (type, info) {
