@@ -192,8 +192,12 @@ instance.prototype.incomingData = function (data) {
 		debug('backup stream confidence a change')
 	}
 
-	if (self.login === true && data.match(/RcdrM13\*/)) {
-		self.states['title'] = data.split(/RcdrM13\*/).join('')
+	if (self.login === true && data.match(/RcdrM13/)) {
+		if (data.match(/RcdrM13\*/)) {
+			self.states['title'] = data.split(/RcdrM13\*/).join('')
+		} else {
+			self.states['title'] = 'None'
+		}
 		self.setVariable('recordingTitle', self.states['title'])
 	} else {
 		debug('data no login', data)
