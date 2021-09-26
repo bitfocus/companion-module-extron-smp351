@@ -76,6 +76,7 @@ instance.prototype.incomingData = function (data) {
 		self.socket.write('\x1BS2*2RTMP\n'); // Request Bac B Stream Status
 		self.socket.write('\x1BS2*3RTMP\n'); // Request Bac Confidence A Stream Status
 		self.socket.write('36I\n');
+		self.socket.write('\x1BM13RCDR\n') // Metadata - Title
 		self.status(self.STATUS_OK);
 		debug('logged in');
 	}
@@ -90,6 +91,7 @@ instance.prototype.incomingData = function (data) {
 		self.socket.write('\x1BS2*2RTMP\n'); // Request Bac B Stream Status
 		self.socket.write('\x1BS2*3RTMP\n'); // Request Bac Confidence A Stream Status
 		self.socket.write('36I\n');
+		self.socket.write('\x1BM13RCDR\n') // Metadata - Title
 		self.status(self.STATUS_OK);
 		debug('Heartbeat done');
 	}
@@ -188,6 +190,11 @@ instance.prototype.incomingData = function (data) {
 		self.states['rtmpStatus_ca2_bg'] = parseInt(data.match(/RtmpS2\*3\*(\d+)/)[1]);
 		self.checkFeedbacks('rtmpStatus_ca2_bg');
 		debug('backup stream confidence a change');
+	}
+
+	if (self.login === true && data.match(/RcdrM13\*/)) {
+		self.states['title'] = data.split(/RcdrM13\*/).join("")
+		self.setVariable('recordingTitle', self.states['title']);
 	}
 
 	else {
@@ -523,6 +530,12 @@ instance.prototype.init_variables = function () {
 		name: 'timeRemain'
 	});
 	self.setVariable('timeRemain', timeRemain);
+
+	variables.push({
+		label: 'Current recording title',
+		name: 'recordingTitle'
+	});
+	self.setVariable('recordingTitle', 'None');
 
 	self.setVariableDefinitions(variables);
 }
