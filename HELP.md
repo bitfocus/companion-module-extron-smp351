@@ -4,25 +4,26 @@
 
 ## Connecting
 
-* Admin or User Password can be set if used
-* Extron telnet connection has a timeout default 5mins
+- Admin or User Password can be set if used
+- Extron telnet connection has a timeout default 5mins
 
 ## Supported commands
 
-* **Input to Output Channel** Route an input to an output channel
-* **Recall Presets** Recall user, input & layout presets
-* **Start Recording** Start a recording
-* **Stop Recording** Stop a recording
-* **Pause Recording** Pause a recording
-* **Extend Recording** Extend a scheduled recording by X mins
-* **RTMP Stream** Start/Stop
+- **Input to Output Channel** Route an input to an output channel
+- **Recall Presets** Recall user, input & layout presets
+- **Start Recording** Start a recording
+- **Stop Recording** Stop a recording
+- **Pause Recording** Pause a recording
+- **Extend Scheduled Recording** Extend a scheduled recording by 1 - 60 minutes
+- **RTMP Stream** Start/Stop
 
 ## Supported feedback
 
-* **Record state** Stop/Record/Pause
-* **Stream Primary/Backup state** On/Off
+- **Record state** Stop/Record/Pause
+- **Stream Primary/Backup state** On/Off
 
 ## Supported button variables
 
-* **Record state** Stopped/Recording/Paused
-* **Time Remaining** Time remaining on a recording in hh:mm format
+- **Record state** Stopped/Recording/Paused
+- **Time Remaining** Time remaining on a recording in hh:mm format
+- **Recording Title** Title of the active recording
