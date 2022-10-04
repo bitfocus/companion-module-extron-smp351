@@ -21,6 +21,7 @@
 
 - **Record state** Stop/Record/Pause
 - **Stream Primary/Backup state** On/Off
+- **Dual Encoder mode** On/Off
 
 ## Supported button variables
 
