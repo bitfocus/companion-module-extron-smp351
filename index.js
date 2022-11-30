@@ -75,6 +75,7 @@ instance.prototype.incomingData = function (data) {
 		self.socket.write('\x1BS2*1RTMP\n') // Request Bac A Stream Status
 		self.socket.write('\x1BS2*2RTMP\n') // Request Bac B Stream Status
 		self.socket.write('\x1BS2*3RTMP\n') // Request Bac Confidence A Stream Status
+		self.socket.write('\x1B1ENCM\n') // Request Composite/Dual Channel Encoder mode
 		self.socket.write('36I\n')
 		self.socket.write('\x1BM13RCDR\n') // Metadata - Title
 		self.status(self.STATUS_OK)
@@ -90,6 +91,7 @@ instance.prototype.incomingData = function (data) {
 		self.socket.write('\x1BS2*1RTMP\n') // Request Bac A Stream Status
 		self.socket.write('\x1BS2*2RTMP\n') // Request Bac B Stream Status
 		self.socket.write('\x1BS2*3RTMP\n') // Request Bac Confidence A Stream Status
+		self.socket.write('\x1B1ENCM\n') // Request Composite/Dual Channel Encoder mode
 		self.socket.write('36I\n')
 		self.socket.write('\x1BM13RCDR\n') // Metadata - Title
 		self.status(self.STATUS_OK)
@@ -192,6 +194,12 @@ instance.prototype.incomingData = function (data) {
 		debug('backup stream confidence a change')
 	}
 
+	if (self.login === true && data.match(/Encm1\*\d/)) {
+		self.states['encoder_mode_dual'] = parseInt(data.match(/Encm1\*(\d)/)[1])
+		self.checkFeedbacks('encoder_mode_dual')
+		debug('encoder mode change')
+	}
+
 	if (self.login === true && data.match(/RcdrM13/)) {
 		if (data.match(/RcdrM13\*/)) {
 			self.states['title'] = data.split(/RcdrM13\*/).join('')
@@ -264,6 +272,7 @@ instance.prototype.CHOICES_PRESET = {
 	streamPreset: 3,
 	encoderPreset: 4,
 	layoutPreset: 7,
+	layoutPresetDual: 9,
 }
 
 instance.prototype.CHOICES_RECORD = [
@@ -463,6 +472,25 @@ instance.prototype.init_feedbacks = function () {
 		],
 	}
 
+	feedbacks['encoder_mode_dual'] = {
+		type: 'boolean',
+		label: 'Dual Channel Encoder Mode',
+		description: 'Record a separate video file for each channel (LinkLicense required)',
+		style: {
+			color: self.rgb(255, 255, 255),
+			bgcolor: self.rgb(255, 128, 128),
+		},
+		options: [
+			{
+				type: 'dropdown',
+				label: 'On/Off',
+				id: 'onoff',
+				default: 0,
+				choices: self.CHOICES_ONOFF,
+			},
+		],
+	}
+
 	self.setFeedbackDefinitions(feedbacks)
 }
 
@@ -507,6 +535,11 @@ instance.prototype.feedback = function (feedback, bank) {
 
 	if (feedback.type === 'rtmpStatus_ca2_bg') {
 		if (self.states['rtmpStatus_ca2_bg'] === parseInt(feedback.options.onoff)) {
+			return true
+		}
+	}
+	if (feedback.type === 'encoder_mode_dual') {
+		if (self.states['encoder_mode_dual'] === parseInt(feedback.options.onoff)) {
 			return true
 		}
 	}
@@ -661,6 +694,20 @@ instance.prototype.actions = function (system) {
 				},
 			],
 		},
+		recall_ps_layout_dual: {
+			label: 'Recall a saved layout preset in Dual Encoding Mode',
+			options: [
+				{
+					type: 'number',
+					label: 'Layout Preset',
+					id: 'preset',
+					default: 1,
+					min: 1,
+					max: 10,
+					range: false,
+				},
+			],
+		},
 		record: {
 			label: 'Stop/Record/Pause',
 			options: [
@@ -742,6 +789,10 @@ instance.prototype.action = function (action) {
 			cmd = self.CHOICES_PRESET.layoutPreset + '*' + opt.preset + '.'
 			break
 
+		case 'recall_ps_layout_dual':
+			cmd = self.CHOICES_PRESET.layoutPresetDual + '*3*' + opt.preset + '.'
+			break
+
 		case 'record':
 			cmd = '\x1BY' + opt.record_action + 'RCDR'
 			break
@@ -753,6 +804,7 @@ instance.prototype.action = function (action) {
 		case 'rtmp_stream':
 			cmd = '\x1BE' + opt.rtmp_stream + '*' + opt.onoff + 'RTMP'
 			break
+
 	}
 
 	if (cmd !== undefined) {
