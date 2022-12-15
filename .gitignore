@@ -1,4 +1,6 @@
-
+/node_modules
 .DS_Store
 .eslintrc
 .vscode/settings.json
+/pkg
+/pkg.tgz
