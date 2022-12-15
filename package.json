@@ -1,27 +1,20 @@
 {
 	"name": "extron-smp351",
-	"version": "1.3.1",
-	"api_version": "1.0.0",
-	"keywords": [
-		"Stream",
-		"Recording"
-	],
-	"manufacturer": "Extron",
-	"product": "SMP 351",
-	"shortname": "SMP 351",
-	"description": "Extron SMP 351 plugin for Companion",
+	"version": "2.0.0",
 	"main": "index.js",
+	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
-	"author": "Nigel Brown <eventreplay@outlook.com>",
 	"license": "MIT",
-	"homepage": "https://github.com/bitfocus/companion-module-extron-smp351#readme",
-	"bugs": {
-		"url": "https://github.com/bitfocus/companion-module-extron-smp351/issues"
-	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/bitfocus/companion-module-extron-smp351.git"
+	},
+	"dependencies": {
+		"@companion-module/base": "~1.0.0"
+	},
+	"devDependencies": {
+		"@companion-module/tools": "^0.5.1"
 	}
 }

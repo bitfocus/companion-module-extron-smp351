@@ -1,13 +1,12 @@
-# Module for Extron SMP 351
+# Extron SMP 351
 
-> This module connects to the Extron H.264 Streaming Media Processor (SMP) 351 and allows you to login, send commands, and recieve feedback based on the status of the device.
+This module connects to the Extron H.264 Streaming Media Processor (SMP) 351.
 
-## Connecting
+## Configuration
 
-- Admin or User Password can be set if used
-- Extron telnet connection has a timeout default 5mins
+- Enter the IP address and password for your Extron device in the module settings
 
-## Supported commands
+## Actions
 
 - **Input to Output Channel** Route an input to an output channel
 - **Recall Presets** Recall user, input & layout presets
@@ -17,13 +16,13 @@
 - **Extend Scheduled Recording** Extend a scheduled recording by 1 - 60 minutes
 - **RTMP Stream** Start/Stop
 
-## Supported feedback
+## Feedback
 
 - **Record state** Stop/Record/Pause
 - **Stream Primary/Backup state** On/Off
 - **Dual Encoder mode** On/Off
 
-## Supported button variables
+## Variables
 
 - **Record state** Stopped/Recording/Paused
 - **Time Remaining** Time remaining on a recording in hh:mm format
