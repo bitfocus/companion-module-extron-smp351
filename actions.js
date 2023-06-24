@@ -205,6 +205,13 @@ export function getActions() {
 				this.sendCommand(`\x1BE${action.options.rtmp_stream}*${action.options.onoff}RTMP`)
 			},
 		},
+		mark: {
+			name: 'Add Chapter Marker',
+			options: [],
+			callback: () => {
+				this.sendCommand(`\x1BBRCDR`)
+			},
+		},
 	}
 
 	return actions
