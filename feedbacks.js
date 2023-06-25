@@ -201,5 +201,54 @@ export function getFeedbacks() {
 		},
 	}
 
+	feedbacks['audio_mute'] = {
+		type: 'boolean',
+		name: 'Audio Mute Status',
+		description: 'If the audio channel matches the mute status, change the style of the button',
+		defaultStyle: {
+			color: ColorWhite,
+			bgcolor: ColorRed,
+		},
+		options: [
+			{
+				type: 'dropdown',
+				label: 'Audio Type',
+				id: 'audio_type',
+				choices: this.AUDIOTYPE,
+				default: '4',
+			},
+			{
+				type: 'dropdown',
+				label: 'Audio Input',
+				id: 'audio_input',
+				choices: this.AUDIOINCHANNEL,
+				default: '0',
+				isVisible: (options) => options.audio_type === '4',
+			},
+			{
+				type: 'dropdown',
+				label: 'Audio Output',
+				id: 'audio_output',
+				choices: this.AUDIOOUTCHANNEL,
+				default: '0',
+				isVisible: (options) => options.audio_type === '6',
+			},
+			{
+				type: 'dropdown',
+				label: 'Mute/Unmute',
+				id: 'mute',
+				choices: this.MUTEUNMUTE,
+				default: '1',
+			},
+		],
+		callback: (feedback) => {
+			if (feedback.options.audio_type === '4') {
+				return this.states[`audio_input_${feedback.options.audio_input}`] === feedback.options.mute
+			} else {
+				this.states[`audio_output_${feedback.options.audio_output}`] === feedback.options.mute
+			}
+		},
+	}
+
 	return feedbacks
 }

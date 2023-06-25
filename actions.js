@@ -212,6 +212,50 @@ export function getActions() {
 				this.sendCommand(`\x1BBRCDR`)
 			},
 		},
+		audio_mute: {
+			name: 'Audio Mute/Unmute',
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Audio Type',
+					id: 'audio_type',
+					choices: this.AUDIOTYPE,
+					default: '4',
+				},
+				{
+					type: 'dropdown',
+					label: 'Audio Input',
+					id: 'audio_input',
+					choices: this.AUDIOINCHANNEL,
+					default: '0',
+					isVisible: (options) => options.audio_type === '4',
+				},
+				{
+					type: 'dropdown',
+					label: 'Audio Output',
+					id: 'audio_output',
+					choices: this.AUDIOOUTCHANNEL,
+					default: '0',
+					isVisible: (options) => options.audio_type === '6',
+				},
+				{
+					type: 'dropdown',
+					label: 'Mute/Unmute',
+					id: 'mute',
+					choices: this.MUTEUNMUTE,
+					default: '1',
+				},
+			],
+			callback: (action) => {
+				let channel
+				if (action.options.audio_type === '4') {
+					channel = action.options.audio_input
+				} else {
+					channel = action.options.audio_output
+				}
+				this.sendCommand(`\x1BM${action.options.audio_type}000${channel}*${action.options.mute}AU`)
+			},
+		},
 	}
 
 	return actions

@@ -88,6 +88,32 @@ class ExtronInstance extends InstanceBase {
 		{ label: 'ON', id: '1' },
 	]
 
+	AUDIOINCHANNEL = [
+		{ label: 'Analog In A Left', id: '0' },
+		{ label: 'Analog In A Right', id: '1' },
+		{ label: 'Digital In A Left', id: '2' },
+		{ label: 'Digital In A Right', id: '3' },
+		{ label: 'Analog In B Left', id: '4' },
+		{ label: 'Analog In B Right', id: '5' },
+		{ label: 'Digital In B Left', id: '6' },
+		{ label: 'Digital In B Right', id: '7' },
+	]
+
+	AUDIOOUTCHANNEL = [
+		{ label: 'Output Left', id: '0' },
+		{ label: 'Output Right', id: '1' },
+	]
+
+	AUDIOTYPE = [
+		{ label: 'Input', id: '4' },
+		{ label: 'Output', id: '6' },
+	]
+
+	MUTEUNMUTE = [
+		{ label: 'Mute', id: '1' },
+		{ label: 'Unmute', id: '0' },
+	]
+
 	initVariables() {
 		const variables = getVariables.bind(this)()
 		this.setVariableDefinitions(variables)
@@ -210,8 +236,24 @@ class ExtronInstance extends InstanceBase {
 			this.socket.send('\x1B1ENCM\n') // Request Composite/Dual Channel Encoder mode
 			this.socket.send('36I\n')
 			this.socket.send('\x1BM13RCDR\n') // Metadata - Title
+
+			//Audio Mute Status
+			//Wait until we can properly process this info before implementing
+
+			/* for (let x in this.AUDIOINCHANNEL) {
+				let channel = this.AUDIOINCHANNEL[x].id
+				console.log(channel)
+				this.socket.send(`\x1BM4000${channel}AU`)
+			}
+
+			for (let x in this.AUDIOOUTCHANNEL) {
+				let channel = this.AUDIOOUTCHANNEL[x].id
+				this.socket.send(`\x1BM6000${channel}AU`)
+			} */
+
 			this.updateStatus('ok')
 		}
+
 		// Match expected response from unit.
 		else if (this.login === false && data.match(/Streaming/)) {
 			this.login = true
@@ -315,6 +357,21 @@ class ExtronInstance extends InstanceBase {
 				this.states['title'] = 'None'
 			}
 			this.setVariableValues({ recordingTitle: this.states['title'] })
+		}
+
+		if (this.login === true && data.match(/DsM\d000\d\*\d/)) {
+			//let audioMuteStatus = data.match(/DsM\d000\d\*\d/)[0]
+			let audioType = data.match(/\d/g)[0]
+			let audioChannel = data.match(/\d/g)[4]
+			let audioStatus = data.match(/\d/g)[5]
+
+			if (audioType === '4') {
+				this.states[`audio_input_${audioChannel}`] = audioStatus
+			} else {
+				this.states[`audio_output_${audioChannel}`] = audioStatus
+			}
+
+			this.checkFeedbacks('audio_mute')
 		}
 	}
 }
