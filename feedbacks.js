@@ -27,9 +27,7 @@ export function getFeedbacks() {
 			},
 		],
 		callback: (feedback) => {
-			if (this.states['record_bg'] === parseInt(feedback.options.record)) {
-				return true
-			}
+			return this.states['record_bg'] === parseInt(feedback.options.record)
 		},
 	}
 
@@ -51,9 +49,7 @@ export function getFeedbacks() {
 			},
 		],
 		callback: (feedback) => {
-			if (this.states['rtmpStatus_a_bg'] === parseInt(feedback.options.onoff)) {
-				return true
-			}
+			return this.states['rtmpStatus_a_bg'] === parseInt(feedback.options.onoff)
 		},
 	}
 
@@ -75,9 +71,7 @@ export function getFeedbacks() {
 			},
 		],
 		callback: (feedback) => {
-			if (this.states['rtmpStatus_b_bg'] === parseInt(feedback.options.onoff)) {
-				return true
-			}
+			return this.states['rtmpStatus_b_bg'] === parseInt(feedback.options.onoff)
 		},
 	}
 
@@ -99,9 +93,7 @@ export function getFeedbacks() {
 			},
 		],
 		callback: (feedback) => {
-			if (this.states['rtmpStatus_ca_bg'] === parseInt(feedback.options.onoff)) {
-				return true
-			}
+			return this.states['rtmpStatus_ca_bg'] === parseInt(feedback.options.onoff)
 		},
 	}
 
@@ -123,9 +115,7 @@ export function getFeedbacks() {
 			},
 		],
 		callback: (feedback) => {
-			if (this.states['rtmpStatus_a2_bg'] === parseInt(feedback.options.onoff)) {
-				return true
-			}
+			return this.states['rtmpStatus_a2_bg'] === parseInt(feedback.options.onoff)
 		},
 	}
 
@@ -147,9 +137,7 @@ export function getFeedbacks() {
 			},
 		],
 		callback: (feedback) => {
-			if (this.states['rtmpStatus_b2_bg'] === parseInt(feedback.options.onoff)) {
-				return true
-			}
+			return this.states['rtmpStatus_b2_bg'] === parseInt(feedback.options.onoff)
 		},
 	}
 
@@ -171,9 +159,7 @@ export function getFeedbacks() {
 			},
 		],
 		callback: (feedback) => {
-			if (this.states['rtmpStatus_ca2_bg'] === parseInt(feedback.options.onoff)) {
-				return true
-			}
+			return this.states['rtmpStatus_ca2_bg'] === parseInt(feedback.options.onoff)
 		},
 	}
 
@@ -195,9 +181,7 @@ export function getFeedbacks() {
 			},
 		],
 		callback: (feedback) => {
-			if (this.states['encoder_mode_dual'] === parseInt(feedback.options.onoff)) {
-				return true
-			}
+			return this.states['encoder_mode_dual'] === parseInt(feedback.options.onoff)
 		},
 	}
 
@@ -245,7 +229,7 @@ export function getFeedbacks() {
 			if (feedback.options.audio_type === '4') {
 				return this.states[`audio_input_${feedback.options.audio_input}`] === feedback.options.mute
 			} else {
-				this.states[`audio_output_${feedback.options.audio_output}`] === feedback.options.mute
+				return this.states[`audio_output_${feedback.options.audio_output}`] === feedback.options.mute
 			}
 		},
 	}
