@@ -1,4 +1,4 @@
-import { InstanceBase, TelnetHelper, Regex, runEntrypoint } from '@companion-module/base'
+import { InstanceBase, TelnetHelper, Regex, InstanceStatus, runEntrypoint } from '@companion-module/base'
 import { getActions } from './actions.js'
 //import { getPresets } from './presets.js'
 import { getVariables } from './variables.js'
@@ -212,35 +212,26 @@ class ExtronInstance extends InstanceBase {
 		}, beat_period * 1000)
 	}
 
-	incomingData(data) {
-		// Match part of the copyright response from unit when a connection is made.
-		if (this.login === false && data.match(/Extron Electronics/)) {
-		}
+	initializeAfterLogin() {
+		this.login = true
+		this.socket.send('\x1B3CV\r') // Set Verbose mode to 3
+		this.socket.send('2I\n') // Query model description
 
-		if (this.login === false && data.match(/Password:/)) {
-			this.socket.send('\r' + this.config.password + '\r') // Enter Password Set
-		}
-		// Match login success response from unit.
-		else if (this.login === false && data.match(/Login/)) {
-			this.login = true
-			this.socket.send('\x1B3CV\r') // Set Verbose mode to 3
-			this.socket.send('2I\n') // Query model description
+		this.socket.send('\x1BYRCDR\n') // Request Record Status
+		this.socket.send('\x1BS1*1RTMP\n') // Request Pri A Stream Status
+		this.socket.send('\x1BS1*2RTMP\n') // Request Pri B Stream Status
+		this.socket.send('\x1BS1*3RTMP\n') // Request Pri Confidence A Stream Status
+		this.socket.send('\x1BS2*1RTMP\n') // Request Bac A Stream Status
+		this.socket.send('\x1BS2*2RTMP\n') // Request Bac B Stream Status
+		this.socket.send('\x1BS2*3RTMP\n') // Request Bac Confidence A Stream Status
+		this.socket.send('\x1B1ENCM\n') // Request Composite/Dual Channel Encoder mode
+		this.socket.send('36I\n')
+		this.socket.send('\x1BM13RCDR\n') // Metadata - Title
 
-			this.socket.send('\x1BYRCDR\n') // Request Record Status
-			this.socket.send('\x1BS1*1RTMP\n') // Request Pri A Stream Status
-			this.socket.send('\x1BS1*2RTMP\n') // Request Pri B Stream Status
-			this.socket.send('\x1BS1*3RTMP\n') // Request Pri Confidence A Stream Status
-			this.socket.send('\x1BS2*1RTMP\n') // Request Bac A Stream Status
-			this.socket.send('\x1BS2*2RTMP\n') // Request Bac B Stream Status
-			this.socket.send('\x1BS2*3RTMP\n') // Request Bac Confidence A Stream Status
-			this.socket.send('\x1B1ENCM\n') // Request Composite/Dual Channel Encoder mode
-			this.socket.send('36I\n')
-			this.socket.send('\x1BM13RCDR\n') // Metadata - Title
+		//Audio Mute Status
+		//Wait until we can properly process this info before implementing
 
-			//Audio Mute Status
-			//Wait until we can properly process this info before implementing
-
-			/* for (let x in this.AUDIOINCHANNEL) {
+		/* for (let x in this.AUDIOINCHANNEL) {
 				let channel = this.AUDIOINCHANNEL[x].id
 				console.log(channel)
 				this.socket.send(`\x1BM4000${channel}AU`)
@@ -251,7 +242,25 @@ class ExtronInstance extends InstanceBase {
 				this.socket.send(`\x1BM6000${channel}AU`)
 			} */
 
-			this.updateStatus('ok')
+		this.updateStatus('ok')
+	}
+
+	incomingData(data) {
+		// Match part of the copyright response from unit when a connection is made.
+		if (this.login === false && data.match(/Extron Electronics/)) {
+			if (this.config.password) {
+				this.socket.send('\r' + this.config.password + '\r') // Enter Password Set
+			} else {
+				this.initializeAfterLogin()
+			}
+		}
+
+		if (this.login === false && data.match(/Password:/)) {
+			this.updateStatus(InstanceStatus.BadConfig, 'Invalid Password')
+		}
+		// Match login success response from unit.
+		else if (this.login === false && data.match(/Login/)) {
+			this.initializeAfterLogin()
 		}
 
 		// Match expected response from unit.
